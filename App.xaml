@@ -1,0 +1,28 @@
+<Application x:Class="AkiLink.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:AkiLink.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Theme + styles (Brushes, Controls) -->
+                <ResourceDictionary Source="Styles/ModernTheme.xaml" />
+                <!-- Default locale (swapped at runtime by LocalizationService) -->
+                <ResourceDictionary Source="Resources/Locale.en-US.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Global converters -->
+            <converters:ConnectionStateToColorConverter x:Key="ConnectionStateToColorConverter" />
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:BoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" Invert="True" />
+            <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:ViewTypeEqualityConverter x:Key="ViewTypeEqualityConverter" />
+            <converters:ViewTypeToVisibilityConverter x:Key="ViewTypeToVisibilityConverter" />
+            <converters:PercentToSignalOpacityConverter x:Key="PercentToSignalOpacityConverter" />
+            <converters:ViewToActiveBrushConverter x:Key="ViewToActiveBrushConverter" />
+            <converters:BoolToBrushConverter x:Key="BoolToBrushConverter" />
+            <converters:ConnectionEventTypeToTextConverter x:Key="ConnectionEventTypeToTextConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,102 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- ════════════ App ════════════ -->
+    <sys:String x:Key="AppTitle">AkiLink</sys:String>
+    <sys:String x:Key="AppSubtitle">Bluetooth Audio Receiver</sys:String>
+
+    <!-- ════════════ Sidebar Navigation ════════════ -->
+    <sys:String x:Key="NavDevices">Devices</sys:String>
+    <sys:String x:Key="NavSettings">Settings</sys:String>
+    <sys:String x:Key="NavHistory">History</sys:String>
+
+    <!-- ════════════ Devices Panel ════════════ -->
+    <sys:String x:Key="DevicesTitle">Devices</sys:String>
+    <sys:String x:Key="DevicesCount">{0} device(s)</sys:String>
+    <sys:String x:Key="DevicesEmpty">No devices found. Click Refresh to scan.</sys:String>
+    <sys:String x:Key="DevicesScanning">Scanning...</sys:String>
+    <sys:String x:Key="DeviceRefresh">Refresh</sys:String>
+
+    <!-- ════════════ Connection Panel ════════════ -->
+    <sys:String x:Key="ConnectionTitle">Connection</sys:String>
+    <sys:String x:Key="ConnectBtn">Connect</sys:String>
+    <sys:String x:Key="DisconnectBtn">Disconnect</sys:String>
+    <sys:String x:Key="DeviceLabel">Device:</sys:String>
+    <sys:String x:Key="StatusLabel">Status:</sys:String>
+    <sys:String x:Key="StatusConnected">Connected</sys:String>
+    <sys:String x:Key="StatusDisconnected">Disconnected</sys:String>
+    <sys:String x:Key="StatusConnecting">Connecting...</sys:String>
+    <sys:String x:Key="AutoReconnect">Auto-Reconnect</sys:String>
+    <sys:String x:Key="AutoReconnectDesc">Automatically reconnect to last device</sys:String>
+
+    <!-- ════════════ Volume Panel ════════════ -->
+    <sys:String x:Key="VolumeTitle">Volume</sys:String>
+    <sys:String x:Key="Mute">Mute</sys:String>
+    <sys:String x:Key="Unmute">Unmute</sys:String>
+
+    <!-- ════════════ Settings Panel ════════════ -->
+    <sys:String x:Key="SettingsTitle">Settings</sys:String>
+    <sys:String x:Key="SettingsLanguage">Language</sys:String>
+    <sys:String x:Key="LangEn">English</sys:String>
+    <sys:String x:Key="LangZh">中文</sys:String>
+    <sys:String x:Key="SettingsCodec">Audio Codec</sys:String>
+    <sys:String x:Key="CodecAuto">Auto</sys:String>
+    <sys:String x:Key="CodecSBC">SBC</sys:String>
+    <sys:String x:Key="CodecAAC">AAC</sys:String>
+    <sys:String x:Key="CodecAptX">aptX</sys:String>
+    <sys:String x:Key="CodecLDAC">LDAC</sys:String>
+    <sys:String x:Key="CodecDescription">Select preferred Bluetooth audio codec. The actual codec used depends on both device and receiver support.</sys:String>
+    <sys:String x:Key="SettingsBitrate">Bitrate</sys:String>
+    <sys:String x:Key="SettingsSampleRate">Sample Rate</sys:String>
+    <sys:String x:Key="SettingsTransmission">Transmission Mode</sys:String>
+    <sys:String x:Key="ModeBestQuality">Best Quality</sys:String>
+    <sys:String x:Key="ModeBalanced">Balanced</sys:String>
+    <sys:String x:Key="ModeLowLatency">Low Latency</sys:String>
+    <sys:String x:Key="TransmissionDesc">Balanced mode optimizes between quality and latency. Best Quality prioritizes audio fidelity. Low Latency minimizes delay for real-time playback.</sys:String>
+
+    <!-- ════════════ Quality Guide ════════════ -->
+    <sys:String x:Key="QualityGuideTitle">Audio Quality Guide</sys:String>
+    <sys:String x:Key="QualityGuideDesc">For best audio quality, set your Windows playback device format to:</sys:String>
+    <sys:String x:Key="QualityGuideSetting1">24-bit, 48000 Hz (Studio Quality)</sys:String>
+    <sys:String x:Key="QualityGuideSetting2">24-bit, 44100 Hz</sys:String>
+    <sys:String x:Key="QualityGuideHint">This prevents Windows from resampling the audio stream, preserving the original fidelity from your Bluetooth device. Go to Settings → System → Sound → Device Properties to configure the output format.</sys:String>
+
+    <!-- ════════════ History Panel ════════════ -->
+    <sys:String x:Key="HistoryTitle">Connection History</sys:String>
+    <sys:String x:Key="HistoryEmpty">No connection history yet.</sys:String>
+    <sys:String x:Key="ClearHistory">Clear History</sys:String>
+    <sys:String x:Key="HistoryTime">Time</sys:String>
+    <sys:String x:Key="HistoryDevice">Device</sys:String>
+    <sys:String x:Key="HistoryEvent">Event</sys:String>
+    <sys:String x:Key="EventConnected">Connected</sys:String>
+    <sys:String x:Key="EventDisconnected">Disconnected</sys:String>
+    <sys:String x:Key="EventError">Error</sys:String>
+
+    <!-- ════════════ Status Bar ════════════ -->
+    <sys:String x:Key="StatusScanning">Scanning for Bluetooth audio devices...</sys:String>
+    <sys:String x:Key="StatusFound">Found {0} device(s)</sys:String>
+    <sys:String x:Key="StatusNoDevices">No Bluetooth audio devices found. Make sure your device is paired.</sys:String>
+    <sys:String x:Key="StatusConnectingTo">Connecting to {0}...</sys:String>
+    <sys:String x:Key="StatusConnectedTo">Connected to {0}</sys:String>
+    <sys:String x:Key="StatusDisconnectedMsg">Disconnected from device</sys:String>
+    <sys:String x:Key="StatusErrorMsg">Error: {0}</sys:String>
+    <sys:String x:Key="StatusReady">Ready</sys:String>
+
+    <!-- ════════════ Confirmations ════════════ -->
+    <sys:String x:Key="ConfirmClearHistory">Clear all connection history?</sys:String>
+    <sys:String x:Key="ConfirmDisconnect">Disconnect from current device?</sys:String>
+    <sys:String x:Key="Yes">Yes</sys:String>
+    <sys:String x:Key="No">No</sys:String>
+
+    <!-- ════════════ Tooltips ════════════ -->
+    <sys:String x:Key="TooltipCodec">Select the Bluetooth audio codec. SBC is universally supported. AAC offers better quality on Apple devices. aptX and LDAC provide high-quality audio on compatible Android devices and headphones.</sys:String>
+    <sys:String x:Key="TooltipBitrate">Higher bitrate delivers better audio quality but uses more bandwidth. 128k is the minimum for acceptable quality; 320k+ approaches lossless transparency.</sys:String>
+    <sys:String x:Key="TooltipSampleRate">Sample rate determines audio frequency range. 44100 Hz (CD quality) is standard. 48000 Hz is used for video content. Higher rates capture more detail.</sys:String>
+    <sys:String x:Key="TooltipTransmission">Transmission mode affects the balance between audio quality and real-time performance. Best Quality may introduce slight latency; Low Latency reduces delay for video/gaming.</sys:String>
+
+    <!-- Compact Mode -->
+    <sys:String x:Key="CompactModeTooltip">Compact Mode</sys:String>
+    <sys:String x:Key="CompactModeExit">Exit Compact Mode</sys:String>
+    <sys:String x:Key="CompactNoDevice">No Device Selected</sys:String>
+</ResourceDictionary>

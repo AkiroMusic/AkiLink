@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);tests/**</DefaultItemExcludes>
+    <DefaultExcludesInProjectFolder>true</DefaultExcludesInProjectFolder>
+  </PropertyGroup>
+</Project>

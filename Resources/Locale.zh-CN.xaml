@@ -1,0 +1,102 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- ════════════ App ════════════ -->
+    <sys:String x:Key="AppTitle">AkiLink</sys:String>
+    <sys:String x:Key="AppSubtitle">蓝牙音频接收器</sys:String>
+
+    <!-- ════════════ Sidebar Navigation ════════════ -->
+    <sys:String x:Key="NavDevices">设备</sys:String>
+    <sys:String x:Key="NavSettings">设置</sys:String>
+    <sys:String x:Key="NavHistory">历史</sys:String>
+
+    <!-- ════════════ Devices Panel ════════════ -->
+    <sys:String x:Key="DevicesTitle">设备列表</sys:String>
+    <sys:String x:Key="DevicesCount">共 {0} 个设备</sys:String>
+    <sys:String x:Key="DevicesEmpty">未找到设备，点击刷新进行扫描。</sys:String>
+    <sys:String x:Key="DevicesScanning">正在扫描...</sys:String>
+    <sys:String x:Key="DeviceRefresh">刷新</sys:String>
+
+    <!-- ════════════ Connection Panel ════════════ -->
+    <sys:String x:Key="ConnectionTitle">连接</sys:String>
+    <sys:String x:Key="ConnectBtn">连接</sys:String>
+    <sys:String x:Key="DisconnectBtn">断开</sys:String>
+    <sys:String x:Key="DeviceLabel">设备：</sys:String>
+    <sys:String x:Key="StatusLabel">状态：</sys:String>
+    <sys:String x:Key="StatusConnected">已连接</sys:String>
+    <sys:String x:Key="StatusDisconnected">未连接</sys:String>
+    <sys:String x:Key="StatusConnecting">连接中...</sys:String>
+    <sys:String x:Key="AutoReconnect">自动重连</sys:String>
+    <sys:String x:Key="AutoReconnectDesc">自动重连上次连接的设备</sys:String>
+
+    <!-- ════════════ Volume Panel ════════════ -->
+    <sys:String x:Key="VolumeTitle">音量</sys:String>
+    <sys:String x:Key="Mute">静音</sys:String>
+    <sys:String x:Key="Unmute">取消静音</sys:String>
+
+    <!-- ════════════ Settings Panel ════════════ -->
+    <sys:String x:Key="SettingsTitle">设置</sys:String>
+    <sys:String x:Key="SettingsLanguage">语言</sys:String>
+    <sys:String x:Key="LangEn">English</sys:String>
+    <sys:String x:Key="LangZh">中文</sys:String>
+    <sys:String x:Key="SettingsCodec">音频编码</sys:String>
+    <sys:String x:Key="CodecAuto">自动</sys:String>
+    <sys:String x:Key="CodecSBC">SBC</sys:String>
+    <sys:String x:Key="CodecAAC">AAC</sys:String>
+    <sys:String x:Key="CodecAptX">aptX</sys:String>
+    <sys:String x:Key="CodecLDAC">LDAC</sys:String>
+    <sys:String x:Key="CodecDescription">选择首选蓝牙音频编码。实际使用的编码取决于设备和接收器的支持情况。</sys:String>
+    <sys:String x:Key="SettingsBitrate">比特率</sys:String>
+    <sys:String x:Key="SettingsSampleRate">采样率</sys:String>
+    <sys:String x:Key="SettingsTransmission">传输模式</sys:String>
+    <sys:String x:Key="ModeBestQuality">最佳音质</sys:String>
+    <sys:String x:Key="ModeBalanced">均衡</sys:String>
+    <sys:String x:Key="ModeLowLatency">低延迟</sys:String>
+    <sys:String x:Key="TransmissionDesc">均衡模式在音质和延迟之间取得平衡。最佳音质优先保证音频保真度。低延迟模式减少实时播放的延迟。</sys:String>
+
+    <!-- ════════════ Quality Guide ════════════ -->
+    <sys:String x:Key="QualityGuideTitle">音质指南</sys:String>
+    <sys:String x:Key="QualityGuideDesc">为获得最佳音质，请将 Windows 播放设备格式设置为：</sys:String>
+    <sys:String x:Key="QualityGuideSetting1">24 位，48000 Hz（录音室音质）</sys:String>
+    <sys:String x:Key="QualityGuideSetting2">24 位，44100 Hz</sys:String>
+    <sys:String x:Key="QualityGuideHint">这可以防止 Windows 对音频流进行重采样，从而保留来自蓝牙设备的原始保真度。请前往 设置 → 系统 → 声音 → 设备属性 配置输出格式。</sys:String>
+
+    <!-- ════════════ History Panel ════════════ -->
+    <sys:String x:Key="HistoryTitle">连接历史</sys:String>
+    <sys:String x:Key="HistoryEmpty">暂无连接记录。</sys:String>
+    <sys:String x:Key="ClearHistory">清空历史</sys:String>
+    <sys:String x:Key="HistoryTime">时间</sys:String>
+    <sys:String x:Key="HistoryDevice">设备</sys:String>
+    <sys:String x:Key="HistoryEvent">事件</sys:String>
+    <sys:String x:Key="EventConnected">已连接</sys:String>
+    <sys:String x:Key="EventDisconnected">已断开</sys:String>
+    <sys:String x:Key="EventError">错误</sys:String>
+
+    <!-- ════════════ Status Bar ════════════ -->
+    <sys:String x:Key="StatusScanning">正在扫描蓝牙音频设备...</sys:String>
+    <sys:String x:Key="StatusFound">找到 {0} 个设备</sys:String>
+    <sys:String x:Key="StatusNoDevices">未找到蓝牙音频设备，请确保设备已配对。</sys:String>
+    <sys:String x:Key="StatusConnectingTo">正在连接到 {0}...</sys:String>
+    <sys:String x:Key="StatusConnectedTo">已连接到 {0}</sys:String>
+    <sys:String x:Key="StatusDisconnectedMsg">已断开设备连接</sys:String>
+    <sys:String x:Key="StatusErrorMsg">错误：{0}</sys:String>
+    <sys:String x:Key="StatusReady">就绪</sys:String>
+
+    <!-- ════════════ Confirmations ════════════ -->
+    <sys:String x:Key="ConfirmClearHistory">确定要清空所有连接历史吗？</sys:String>
+    <sys:String x:Key="ConfirmDisconnect">确定要断开当前设备吗？</sys:String>
+    <sys:String x:Key="Yes">是</sys:String>
+    <sys:String x:Key="No">否</sys:String>
+
+    <!-- ════════════ Tooltips ════════════ -->
+    <sys:String x:Key="TooltipCodec">选择蓝牙音频编码格式。SBC 通用兼容。AAC 在 Apple 设备上音质更佳。aptX 和 LDAC 在兼容的 Android 设备和耳机上提供高音质音频。</sys:String>
+    <sys:String x:Key="TooltipBitrate">更高的比特率提供更好的音质，但占用更多带宽。128k 是可接受音质的最低标准；320k+ 接近无损。</sys:String>
+    <sys:String x:Key="TooltipSampleRate">采样率决定音频频率范围。44100 Hz（CD 音质）为标准。48000 Hz 用于视频内容。更高的采样率捕捉更多细节。</sys:String>
+    <sys:String x:Key="TooltipTransmission">传输模式影响音质与实时性能之间的平衡。最佳音质可能引入轻微延迟；低延迟模式减少视频/游戏场景的延迟。</sys:String>
+
+    <!-- Compact Mode -->
+    <sys:String x:Key="CompactModeTooltip">精简模式</sys:String>
+    <sys:String x:Key="CompactModeExit">退出精简模式</sys:String>
+    <sys:String x:Key="CompactNoDevice">未选择设备</sys:String>
+</ResourceDictionary>

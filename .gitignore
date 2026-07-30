@@ -1,0 +1,28 @@
+# .NET build output
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+
+# IDE
+.vs/
+.idea/
+*.sln.docstates
+
+# Temp files
+nul
+out=combined.txt
+
+# Test results
+TestResults/
+
+# OpenCode session data
+.omo/
+
+# Project prompt (developer notes, not source)
+AkiLink Prompt.md
+
+# Default test template (unused)
+tests/**/UnitTest1.cs
