@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Windows;
@@ -114,12 +115,19 @@ namespace AkiLink.Services;
 
     // ────────────────────────────── State ──────────────────────────────
 
+    private readonly ILogger<AudioVolumeService>? _logger;
+
     private IMMDeviceEnumerator? _deviceEnumerator;
     private IMMDevice? _device;
     private IAudioEndpointVolume? _endpointVolume;
     private AudioEndpointVolumeCallbackImpl? _callback;
     private bool _disposed;
     private bool _initialized;
+
+    public AudioVolumeService(ILogger<AudioVolumeService>? logger = null)
+    {
+        _logger = logger;
+    }
 
     public event Action<float>? VolumeChanged;
     public event Action<bool>? MuteChanged;
@@ -150,7 +158,7 @@ namespace AkiLink.Services;
             var comType = Type.GetTypeFromCLSID(clsid);
             if (comType == null)
             {
-                System.Diagnostics.Debug.WriteLine("[AkiLink] AudioVolumeService: Failed to resolve MMDeviceEnumerator COM class");
+                _logger?.LogWarning("[AkiLink] AudioVolumeService: Failed to resolve MMDeviceEnumerator COM class");
                 return;
             }
             _deviceEnumerator = (IMMDeviceEnumerator)Activator.CreateInstance(comType)!;
@@ -159,7 +167,7 @@ namespace AkiLink.Services;
             var hr = _deviceEnumerator.GetDefaultAudioEndpoint(E_RENDER, E_CONSOLE, out _device);
             if (hr < 0 || _device == null)
             {
-                System.Diagnostics.Debug.WriteLine($"[AkiLink] AudioVolumeService: GetDefaultAudioEndpoint failed (hr=0x{hr:X8})");
+                _logger?.LogWarning($"[AkiLink] AudioVolumeService: GetDefaultAudioEndpoint failed (hr=0x{hr:X8})");
                 return;
             }
 
@@ -168,7 +176,7 @@ namespace AkiLink.Services;
             hr = _device.Activate(ref iid, CLSCTX_ALL, IntPtr.Zero, out _endpointVolume);
             if (hr < 0 || _endpointVolume == null)
             {
-                System.Diagnostics.Debug.WriteLine($"[AkiLink] AudioVolumeService: Activate failed (hr=0x{hr:X8})");
+                _logger?.LogWarning($"[AkiLink] AudioVolumeService: Activate failed (hr=0x{hr:X8})");
                 return;
             }
 
@@ -177,15 +185,15 @@ namespace AkiLink.Services;
             hr = _endpointVolume!.RegisterControlChangeNotify(_callback);
             if (hr < 0)
             {
-                System.Diagnostics.Debug.WriteLine($"[AkiLink] AudioVolumeService: RegisterControlChangeNotify failed (hr=0x{hr:X8})");
+                _logger?.LogWarning($"[AkiLink] AudioVolumeService: RegisterControlChangeNotify failed (hr=0x{hr:X8})");
             }
 
             _initialized = true;
-            System.Diagnostics.Debug.WriteLine("[AkiLink] AudioVolumeService initialized successfully");
+            _logger?.LogInformation("[AkiLink] AudioVolumeService initialized successfully");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[AkiLink] AudioVolumeService initialization failed: {ex.Message}");
+            _logger?.LogError(ex, "[AkiLink] AudioVolumeService initialization failed: {Message}", ex.Message);
             CleanupCom();
         }
     }
@@ -259,7 +267,7 @@ namespace AkiLink.Services;
         {
             try
             {
-                dispatcher.Invoke(() => OnVolumeNotification(volume, muted));
+                dispatcher.BeginInvoke(() => OnVolumeNotification(volume, muted));
                 return;
             }
             catch

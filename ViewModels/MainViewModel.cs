@@ -14,28 +14,39 @@ namespace AkiLink.ViewModels;
 public enum ViewType
 {
     Devices,
-    Settings,
-    History
+    Audio,
+    Settings
 }
 
 public partial class MainViewModel : ObservableObject
 {
     private readonly IBluetoothAudioService _btService;
     private readonly IAudioVolumeService _volumeService;
+    private readonly ISettingsService _settingsService;
     private readonly IDialogService? _dialogService;
     private bool _isUpdatingVolume;
     private bool _isUpdatingMuted;
+    private float _savedVolume = 0.75f;
+    private bool _savedIsMuted;
 
-    public MainViewModel(IBluetoothAudioService btService, IAudioVolumeService volumeService, IDialogService? dialogService = null)
+    public MainViewModel(IBluetoothAudioService btService, IAudioVolumeService volumeService, ISettingsService settingsService, IDialogService? dialogService = null)
     {
         _btService = btService;
         _volumeService = volumeService;
+        _settingsService = settingsService;
         _dialogService = dialogService;
 
         Devices = new ObservableCollection<BluetoothDeviceInfo>();
         ConnectionHistory = new ObservableCollection<ConnectionHistoryEntry>();
         ConnectionHistory.CollectionChanged += (_, _) => HasHistory = ConnectionHistory.Count > 0;
         CodecSettings = new AudioCodecSettings();
+        CodecSettings.PropertyChanged += (_, e) =>
+        {
+            // Real-time sync: when any codec sub-property changes (codec, bitrate,
+            // sample rate, transmission mode), push to the service and persist.
+            _btService.ConfigureCodec(CodecSettings);
+            SaveSettings();
+        };
 
         // Subscribe to service events
         _btService.DevicesUpdated += OnBtDevicesUpdated;
@@ -47,13 +58,33 @@ public partial class MainViewModel : ObservableObject
         _volumeService.VolumeChanged += OnVolumeServiceVolumeChanged;
         _volumeService.MuteChanged += OnVolumeServiceMuteChanged;
 
-        // Initialize
-        _volumeService.Initialize();
-        Volume = _volumeService.Volume;
-        IsMuted = _volumeService.IsMuted;
+        // Load persisted settings (used as defaults for Volume/IsMuted)
+        LoadSettings();
 
         // Push initial codec preferences to the service
         _btService.ConfigureCodec(CodecSettings);
+
+        // Defer AudioVolumeService COM init via Dispatcher to avoid a .NET JIT/GC-tracking
+        // segfault when calling COM RCW methods during DI container startup.
+        // In unit tests (no WPF Application), run synchronously instead.
+        var dispatcher = System.Windows.Application.Current?.Dispatcher;
+        if (dispatcher is not null)
+        {
+            _ = dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
+                new Action(() =>
+                {
+                    _volumeService.Initialize();
+                    Volume = _savedVolume;
+                    IsMuted = _savedIsMuted;
+                }));
+        }
+        else
+        {
+            // Unit test path — safe because mocks don't invoke real COM
+            _volumeService.Initialize();
+            Volume = _savedVolume;
+            IsMuted = _savedIsMuted;
+        }
     }
 
     // ─── Observable Properties ───────────────────────────
@@ -91,15 +122,13 @@ public partial class MainViewModel : ObservableObject
     private bool _autoReconnect;
 
     [ObservableProperty]
+    private bool _closeToTray;
+
+    [ObservableProperty]
     private string _statusMessage = string.Empty;
 
     [ObservableProperty]
     private AudioPlaybackConnectionState _connectionState = AudioPlaybackConnectionState.Closed;
-
-    // ─── Compact Mode ────────────────────────────────────
-
-    [ObservableProperty]
-    private bool _isCompactMode;
 
     // ─── Connection Quality ──────────────────────────────
 
@@ -126,29 +155,19 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    // ─── Audio Codec Settings ────────────────────────────
-
     [ObservableProperty]
     private AudioCodecSettings _codecSettings;
 
     partial void OnCodecSettingsChanged(AudioCodecSettings value)
     {
         _btService.ConfigureCodec(value);
+        SaveSettings();
     }
 
     [RelayCommand]
-    private void ToggleCompactMode()
+    private void SelectCodec(PreferredCodec codec)
     {
-        IsCompactMode = !IsCompactMode;
-    }
-
-    [RelayCommand]
-    private void SelectCodec(string codecName)
-    {
-        if (Enum.TryParse<PreferredCodec>(codecName, ignoreCase: true, out var codec))
-        {
-            CodecSettings.Codec = codec;
-        }
+        CodecSettings.Codec = codec;
     }
 
     [RelayCommand]
@@ -167,12 +186,9 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void SelectTransmissionMode(string modeName)
+    private void SelectTransmissionMode(TransmissionMode mode)
     {
-        if (Enum.TryParse<TransmissionMode>(modeName, ignoreCase: true, out var mode))
-        {
-            CodecSettings.TransmissionMode = mode;
-        }
+        CodecSettings.TransmissionMode = mode;
     }
 
     // ─── Connection History ──────────────────────────────
@@ -307,6 +323,7 @@ public partial class MainViewModel : ObservableObject
     private void ChangeLanguage(string culture)
     {
         LocalizationService.Instance.ChangeLanguage(culture);
+        SaveSettings();
     }
 
     // ─── Partial Methods (from ObservableProperty) ──────
@@ -315,12 +332,14 @@ public partial class MainViewModel : ObservableObject
     {
         if (_isUpdatingVolume) return;
         _volumeService.Volume = value;
+        SaveSettings();
     }
 
     partial void OnIsMutedChanged(bool value)
     {
         if (_isUpdatingMuted) return;
         _volumeService.IsMuted = value;
+        SaveSettings();
     }
 
     partial void OnAutoReconnectChanged(bool value)
@@ -333,6 +352,7 @@ public partial class MainViewModel : ObservableObject
         {
             _ = _btService.StartAutoReconnectAsync(SelectedDevice.Id);
         }
+        SaveSettings();
     }
 
     partial void OnSelectedDeviceChanged(BluetoothDeviceInfo? value)
@@ -340,7 +360,54 @@ public partial class MainViewModel : ObservableObject
         ConnectCommand.NotifyCanExecuteChanged();
     }
 
-    // ─── Safe Dispatcher Helper ─────────────────────────
+    partial void OnCloseToTrayChanged(bool value)
+    {
+        SaveSettings();
+    }
+
+    // ─── Settings Persistence ───────────────────────────
+
+    private void LoadSettings()
+    {
+        var s = _settingsService.Load();
+
+        if (Enum.TryParse<PreferredCodec>(s.Codec, ignoreCase: true, out var codec))
+            CodecSettings.Codec = codec;
+        CodecSettings.Bitrate = s.Bitrate;
+        if (s.SampleRate > 0)
+            CodecSettings.SampleRate = s.SampleRate;
+        if (Enum.TryParse<TransmissionMode>(s.TransmissionMode, ignoreCase: true, out var mode))
+            CodecSettings.TransmissionMode = mode;
+
+        // Don't set Volume/IsMuted here — those properties trigger OnVolumeChanged/
+        // OnIsMutedChanged which call _volumeService setters that do COM interop.
+        // That crashes (segfault) during DI container startup (.NET 10 JIT/GC issue
+        // with COM RCW tracking). The deferred init in the constructor applies them.
+        _savedVolume = Math.Clamp(s.Volume, 0f, 1f);
+        _savedIsMuted = s.IsMuted;
+
+        AutoReconnect = s.AutoReconnect;
+        CloseToTray = s.CloseToTray;
+
+        try { LocalizationService.Instance.ChangeLanguage(s.Language); } catch { /* best effort */ }
+    }
+
+    internal void SaveSettings()
+    {
+        var s = new AppSettings
+        {
+            Codec = CodecSettings.Codec.ToString(),
+            Bitrate = CodecSettings.Bitrate,
+            SampleRate = CodecSettings.SampleRate,
+            TransmissionMode = CodecSettings.TransmissionMode.ToString(),
+            Volume = Volume,
+            IsMuted = IsMuted,
+            AutoReconnect = AutoReconnect,
+            CloseToTray = CloseToTray,
+            Language = LocalizationService.Instance.CurrentCulture
+        };
+        _settingsService.Save(s);
+    }
 
     // ─── Locale String Helper ────────────────────────────
 

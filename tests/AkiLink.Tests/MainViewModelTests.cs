@@ -12,6 +12,7 @@ public class MainViewModelTests
     private readonly Mock<IBluetoothAudioService> _btMock;
     private readonly Mock<IAudioVolumeService> _volumeMock;
     private readonly Mock<IDialogService> _dialogMock;
+    private readonly Mock<ISettingsService> _settingsMock;
     private readonly MainViewModel _viewModel;
 
     public MainViewModelTests()
@@ -19,12 +20,14 @@ public class MainViewModelTests
         _btMock = new Mock<IBluetoothAudioService>();
         _volumeMock = new Mock<IAudioVolumeService>();
         _dialogMock = new Mock<IDialogService>();
+        _settingsMock = new Mock<ISettingsService>();
 
         // Setup default mocks
         _volumeMock.Setup(x => x.Volume).Returns(0.75f);
         _volumeMock.Setup(x => x.IsMuted).Returns(false);
+        _settingsMock.Setup(x => x.Load()).Returns(new AppSettings());
 
-        _viewModel = new MainViewModel(_btMock.Object, _volumeMock.Object, _dialogMock.Object);
+        _viewModel = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object);
     }
 
     [Fact]
@@ -180,12 +183,12 @@ public class MainViewModelTests
         _viewModel.Devices.Add(device);
         _viewModel.SelectedDevice = device;
 
-        _btMock.Setup(x => x.ConnectAsync(device.Id))
+        _btMock.Setup(x => x.ConnectAsync(device.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         await _viewModel.ConnectCommand.ExecuteAsync(null);
 
-        _btMock.Verify(x => x.ConnectAsync(device.Id), Times.Once);
+        _btMock.Verify(x => x.ConnectAsync(device.Id, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -195,7 +198,7 @@ public class MainViewModelTests
         _viewModel.Devices.Add(device);
         _viewModel.SelectedDevice = device;
 
-        _btMock.Setup(x => x.ConnectAsync(device.Id))
+        _btMock.Setup(x => x.ConnectAsync(device.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         await _viewModel.ConnectCommand.ExecuteAsync(null);
@@ -213,7 +216,7 @@ public class MainViewModelTests
         _viewModel.SelectedDevice = device;
         _viewModel.AutoReconnect = true;
 
-        _btMock.Setup(x => x.ConnectAsync(device.Id))
+        _btMock.Setup(x => x.ConnectAsync(device.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         await _viewModel.ConnectCommand.ExecuteAsync(null);
@@ -371,7 +374,7 @@ public class MainViewModelTests
 
         await _viewModel.ConnectCommand.ExecuteAsync(null);
 
-        _btMock.Verify(x => x.ConnectAsync(It.IsAny<string>()), Times.Never);
+        _btMock.Verify(x => x.ConnectAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -381,7 +384,7 @@ public class MainViewModelTests
         _viewModel.Devices.Add(device);
         _viewModel.SelectedDevice = device;
 
-        _btMock.Setup(x => x.ConnectAsync(device.Id))
+        _btMock.Setup(x => x.ConnectAsync(device.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
         await _viewModel.ConnectCommand.ExecuteAsync(null);

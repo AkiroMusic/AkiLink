@@ -23,275 +23,6 @@
                 </StackPanel>
             </Border>
 
-            <!-- ── Audio Codec ── -->
-            <Border Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
-                <StackPanel>
-                    <TextBlock Text="{DynamicResource SettingsCodec}"
-                               Style="{StaticResource SettingSectionStyle}" />
-                    <WrapPanel>
-                        <Button Content="Auto" Margin="0,0,6,6" Command="{Binding SelectCodecCommand}" CommandParameter="Auto">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.Codec}" Value="Auto">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="SBC" Margin="0,0,6,6" Command="{Binding SelectCodecCommand}" CommandParameter="SBC">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.Codec}" Value="SBC">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="AAC" Margin="0,0,6,6" Command="{Binding SelectCodecCommand}" CommandParameter="AAC">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.Codec}" Value="AAC">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="aptX" Margin="0,0,6,6" Command="{Binding SelectCodecCommand}" CommandParameter="AptX">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.Codec}" Value="AptX">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="LDAC" Margin="0,0,6,6" Command="{Binding SelectCodecCommand}" CommandParameter="LDAC">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.Codec}" Value="LDAC">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                    </WrapPanel>
-                    <TextBlock Text="{DynamicResource CodecDescription}"
-                               Style="{StaticResource SettingHintStyle}" />
-                </StackPanel>
-            </Border>
-
-            <!-- ── Bitrate ── -->
-            <Border Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
-                <StackPanel>
-                    <TextBlock Text="{DynamicResource SettingsBitrate}"
-                               Style="{StaticResource SettingSectionStyle}" />
-                    <WrapPanel>
-                        <Button Content="Auto" Margin="0,0,6,6" Command="{Binding SelectBitrateCommand}" CommandParameter="Auto">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="Auto">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="128k" Margin="0,0,6,6" Command="{Binding SelectBitrateCommand}" CommandParameter="128k">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="128k">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="256k" Margin="0,0,6,6" Command="{Binding SelectBitrateCommand}" CommandParameter="256k">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="256k">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="320k" Margin="0,0,6,6" Command="{Binding SelectBitrateCommand}" CommandParameter="320k">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="320k">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="512k" Margin="0,0,6,6" Command="{Binding SelectBitrateCommand}" CommandParameter="512k">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="512k">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="990k" Margin="0,0,6,6" Command="{Binding SelectBitrateCommand}" CommandParameter="990k">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="990k">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                    </WrapPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- ── Sample Rate ── -->
-            <Border Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
-                <StackPanel>
-                    <TextBlock Text="{DynamicResource SettingsSampleRate}"
-                               Style="{StaticResource SettingSectionStyle}" />
-                    <WrapPanel>
-                        <Button Content="44100 Hz" Margin="0,0,6,6" Command="{Binding SelectSampleRateCommand}" CommandParameter="44100">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.SampleRate}" Value="44100">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="48000 Hz" Margin="0,0,6,6" Command="{Binding SelectSampleRateCommand}" CommandParameter="48000">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.SampleRate}" Value="48000">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-
-                    </WrapPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- ── Transmission Mode ── -->
-            <Border Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
-                <StackPanel>
-                    <TextBlock Text="{DynamicResource SettingsTransmission}"
-                               Style="{StaticResource SettingSectionStyle}" />
-                    <WrapPanel>
-                        <Button Content="Balanced" Margin="0,0,6,6" Command="{Binding SelectTransmissionModeCommand}" CommandParameter="Balanced">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.TransmissionMode}" Value="Balanced">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="{DynamicResource ModeBestQuality}" Margin="0,0,6,6" Command="{Binding SelectTransmissionModeCommand}" CommandParameter="BestQuality">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.TransmissionMode}" Value="BestQuality">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Content="{DynamicResource ModeLowLatency}" Margin="0,0,6,6" Command="{Binding SelectTransmissionModeCommand}" CommandParameter="LowLatency">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodecSettings.TransmissionMode}" Value="LowLatency">
-                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                    </WrapPanel>
-                    <TextBlock Text="{DynamicResource TransmissionDesc}"
-                               Style="{StaticResource SettingHintStyle}" />
-                </StackPanel>
-            </Border>
-
             <!-- ── Auto-Reconnect ── -->
             <Border Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
                 <Grid>
@@ -315,38 +46,27 @@
                 </Grid>
             </Border>
 
-            <!-- ── Quality Guide ── -->
+            <!-- ── Close to Tray ── -->
             <Border Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
-                <StackPanel>
-                    <TextBlock Text="{DynamicResource QualityGuideTitle}"
-                               FontSize="14"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource ThemeText}"
-                               Margin="0,0,0,4" />
-                    <TextBlock Text="{DynamicResource QualityGuideDesc}"
-                               TextWrapping="Wrap"
-                               FontSize="12"
-                               Foreground="{StaticResource ThemeTextSecondary}"
-                               LineHeight="18"
-                               Margin="0,0,0,12" />
-                    <Border Background="{StaticResource ThemeSurface2}"
-                            CornerRadius="6"
-                            Padding="12,10">
-                        <StackPanel>
-                            <TextBlock FontWeight="SemiBold"
-                                       FontSize="13"
-                                       Foreground="{StaticResource ThemePrimary}">
-                                <Run Text="{DynamicResource QualityGuideSetting1}" />
-                            </TextBlock>
-                            <TextBlock Text="{DynamicResource QualityGuideSetting2}"
-                                       FontSize="12"
-                                       Foreground="{StaticResource ThemeTextSecondary}"
-                                       Margin="0,4,0,0" />
-                        </StackPanel>
-                    </Border>
-                    <TextBlock Text="{DynamicResource QualityGuideHint}"
-                               Style="{StaticResource SettingHintStyle}" />
-                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="{DynamicResource CloseToTray}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource ThemeText}" />
+                        <TextBlock Text="{DynamicResource CloseToTrayDesc}"
+                                   Style="{StaticResource SettingHintStyle}"
+                                   Margin="0,2,0,0" />
+                    </StackPanel>
+                    <ToggleButton Grid.Column="1"
+                                  IsChecked="{Binding CloseToTray}"
+                                  Style="{StaticResource ToggleSwitchStyle}"
+                                  VerticalAlignment="Center" />
+                </Grid>
             </Border>
 
         </StackPanel>

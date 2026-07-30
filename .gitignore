@@ -11,6 +11,10 @@ obj/
 .idea/
 *.sln.docstates
 
+# Published output
+publish/
+*.tar.gz
+
 # Temp files
 nul
 out=combined.txt

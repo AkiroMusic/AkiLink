@@ -1,4 +1,5 @@
 using Hardcodet.Wpf.TaskbarNotification;
+using Microsoft.Extensions.Logging;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -6,13 +7,15 @@ namespace AkiLink.Services;
 
 public class SystemTrayService : IDisposable
 {
+    private readonly ILogger<SystemTrayService>? _logger;
     private TaskbarIcon? _taskbarIcon;
     private Window _mainWindow;
     private bool _disposed;
 
-    public SystemTrayService(Window mainWindow)
+    public SystemTrayService(Window mainWindow, ILogger<SystemTrayService>? logger = null)
     {
         _mainWindow = mainWindow;
+        _logger = logger;
     }
 
     public void Initialize()
@@ -56,7 +59,7 @@ public class SystemTrayService : IDisposable
     }
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    private static System.Drawing.Icon LoadIconFromResource()
+    private System.Drawing.Icon LoadIconFromResource()
     {
         try
         {
@@ -68,7 +71,10 @@ public class SystemTrayService : IDisposable
                     return new System.Drawing.Icon(stream);
             }
         }
-        catch { /* fall through */ }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Failed to load icon from embedded resource");
+        }
 
         // Last resort: extract from the assembly (if the .ico is the ApplicationIcon)
         try
@@ -77,7 +83,10 @@ public class SystemTrayService : IDisposable
                 System.Reflection.Assembly.GetExecutingAssembly().Location);
             if (icon is not null) return icon;
         }
-        catch { /* fall through */ }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Failed to extract icon from assembly");
+        }
 
         // Absolute last resort — 16×16 transparent icon
         using var bmp = new System.Drawing.Bitmap(16, 16);

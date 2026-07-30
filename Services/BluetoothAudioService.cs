@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using System.Windows;
 using AkiLink.Models;
 using Windows.Devices.Enumeration;
@@ -37,7 +38,18 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
     private string? _autoReconnectDeviceId;
     private bool _disposed;
 
+    private readonly ILogger<BluetoothAudioService> _logger;
+    private readonly IBluetoothPlatform _platform;
+
     private readonly Random _rng = new();
+
+    // ───────────────────────── Constructor ────────────────────────────
+
+    public BluetoothAudioService(ILogger<BluetoothAudioService> logger, IBluetoothPlatform platform)
+    {
+        _logger = logger;
+        _platform = platform;
+    }
 
     // ─────────────────────── ScanDevicesAsync ─────────────────────────
 
@@ -45,10 +57,10 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
     {
         try
         {
-            var selector = AudioPlaybackConnection.GetDeviceSelector();
+            var selector = _platform.GetDeviceSelector();
             FireLog($"Scanning for audio playback devices with AQS: {selector}");
 
-            var devices = await DeviceInformation.FindAllAsync(selector);
+            var devices = await _platform.FindAllAudioDevicesAsync(selector);
 
             var list = devices is not null
                 ? (IReadOnlyList<DeviceInformation>)devices
@@ -69,7 +81,7 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
 
     // ───────────────────────── ConnectAsync ───────────────────────────
 
-    public async Task<bool> ConnectAsync(string deviceId)
+    public async Task<bool> ConnectAsync(string deviceId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(deviceId))
         {
@@ -81,6 +93,12 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
 
         for (int attempt = 1; attempt <= maxRetries; attempt++)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                FireLog("ConnectAsync cancelled.");
+                return false;
+            }
+
             // Only tear down the previous connection on the first attempt;
             // subsequent attempts start from a clean slate.
             if (attempt == 1)
@@ -95,7 +113,7 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
                 // TryCreateFromId must be called from an MTA thread to avoid
                 // known AccessViolationException crashes in the WinRT interop
                 // when called from the WPF STA thread.
-                connection = await Task.Run(() => AudioPlaybackConnection.TryCreateFromId(deviceId));
+                connection = await Task.Run(() => _platform.TryCreateAudioPlaybackConnection(deviceId));
             }
             catch (Exception ex)
             {
@@ -104,7 +122,7 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
                 if (attempt < maxRetries)
                 {
                     FireLog($"ConnectAsync attempt {attempt}/{maxRetries} — will retry after TryCreateFromId failure.");
-                    await Task.Delay(1000);
+                    try { await Task.Delay(1000, cancellationToken); } catch (OperationCanceledException) { return false; }
                     continue;
                 }
                 return false;
@@ -116,7 +134,7 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
                 if (attempt < maxRetries)
                 {
                     FireLog($"ConnectAsync attempt {attempt}/{maxRetries} — will retry after null connection.");
-                    await Task.Delay(1000);
+                    try { await Task.Delay(1000, cancellationToken); } catch (OperationCanceledException) { return false; }
                     continue;
                 }
                 return false;
@@ -151,7 +169,7 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
                 if (attempt < maxRetries)
                 {
                     FireLog($"ConnectAsync attempt {attempt}/{maxRetries} — will retry after OpenAsync exception.");
-                    await Task.Delay(1000);
+                    try { await Task.Delay(1000, cancellationToken); } catch (OperationCanceledException) { return false; }
                     continue;
                 }
                 return false;
@@ -181,7 +199,7 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
                         || result.Status == AudioPlaybackConnectionOpenResultStatus.UnknownFailure))
                 {
                     FireLog($"ConnectAsync attempt {attempt}/{maxRetries} — will retry after transient status: {result.Status}.");
-                    await Task.Delay(1000);
+                    try { await Task.Delay(1000, cancellationToken); } catch (OperationCanceledException) { return false; }
                     continue;
                 }
                 return false;
@@ -245,13 +263,13 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
 
                     if (!alreadyConnected)
                     {
-                        var selector = AudioPlaybackConnection.GetDeviceSelector();
-                        var devices = await DeviceInformation.FindAllAsync(selector);
+                        var selector = _platform.GetDeviceSelector();
+                        var devices = await _platform.FindAllAudioDevicesAsync(selector);
 
                         if (devices.Any(d => d.Id.Equals(deviceId, StringComparison.OrdinalIgnoreCase)))
                         {
                             FireLog("Auto-reconnect: target device detected, attempting connection…");
-                            await ConnectAsync(deviceId);
+                            await ConnectAsync(deviceId, token);
                         }
                     }
 
@@ -330,21 +348,20 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
             ? $"{sr / 1000.0:F1} kHz"
             : "—";
 
-        // Signal strength: for WinRT AudioPlaybackConnection there is no
-        // direct RSSI API, so we report a nominal value when connected.
-        const int nominalSignal = 75;
+        // Signal strength: WinRT AudioPlaybackConnection does not expose RSSI,
+        // so we leave SignalStrength null (signal bars in status bar simply
+        // indicate connection state, not actual signal quality).
 
-        // Latency: report based on transmission mode preference.
+        // Latency: estimated from transmission mode preference, not measured.
         var latency = CodecPreferences?.TransmissionMode switch
         {
-            TransmissionMode.LowLatency => "~40 ms",
-            TransmissionMode.BestQuality => "~150 ms",
-            _ => "~80 ms"
+            TransmissionMode.LowLatency => "~40 ms (est.)",
+            TransmissionMode.BestQuality => "~150 ms (est.)",
+            _ => "~80 ms (est.)"
         };
 
         var quality = new ConnectionQuality
         {
-            SignalStrength = nominalSignal,
             CodecInUse = codecLabel,
             Latency = latency,
             Bitrate = bitrateLabel,
@@ -385,7 +402,17 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
         if (connection is not null)
         {
             connection.StateChanged -= OnConnectionStateChanged;
-            connection.Dispose();
+
+            // Dispose on a background (MTA) thread: AudioPlaybackConnection was created
+            // on the MTA via Task.Run in ConnectAsync. Disposing on the WPF STA thread
+            // during shutdown can leave the Bluetooth adapter in an inconsistent state
+            // (intermittent connectivity until reboot).
+            Task.Run(() =>
+            {
+                try { connection.Dispose(); }
+                catch { /* best-effort — process may be shutting down */ }
+            });
+
             FireLog("Active audio connection torn down.");
         }
     }
@@ -442,12 +469,14 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
 
     private void FireError(string message)
     {
+        _logger.LogError("{AkiLink} {Message}", "AkiLink", message);
         FireOnUiThread(() => ErrorOccurred?.Invoke(message));
         FireLog(message);
     }
 
     private void FireLog(string message)
     {
+        _logger.LogInformation("{AkiLink} {Message}", "AkiLink", message);
         FireOnUiThread(() => LogMessage?.Invoke(message));
     }
 }

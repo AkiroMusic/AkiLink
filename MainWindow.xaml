@@ -4,13 +4,25 @@
         xmlns:models="clr-namespace:AkiLink.Models"
         xmlns:views="clr-namespace:AkiLink.Views"
         xmlns:local="clr-namespace:AkiLink"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         Title="AkiLink" Height="650" Width="860"
         MinHeight="500" MinWidth="700"
         WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
         Style="{StaticResource ModernWindowStyle}">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome ResizeBorderThickness="4"
+                            CaptionHeight="0"
+                            GlassFrameThickness="0"
+                            UseAeroCaptionButtons="False"
+                            CornerRadius="0" />
+    </shell:WindowChrome.WindowChrome>
 
     <Grid>
         <Grid.RowDefinitions>
+            <!-- Custom Title Bar -->
+            <RowDefinition Height="32" />
             <!-- Header -->
             <RowDefinition Height="Auto" />
             <!-- Main content (sidebar + content area) -->
@@ -20,20 +32,65 @@
         </Grid.RowDefinitions>
 
         <!-- ════════════════════════════════════════
-             HEADER
-             ════════════════════════════════════════ -->
+              CUSTOM TITLE BAR
+              ════════════════════════════════════════ -->
         <Border Grid.Row="0"
+                Background="{StaticResource ThemeSurface}"
+                BorderBrush="{StaticResource ThemeBorder}"
+                BorderThickness="0,0,0,1"
+                Height="32"
+                MouseDown="TitleBar_MouseDown">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Window title -->
+                <TextBlock Grid.Column="0"
+                           Text="AkiLink"
+                           FontFamily="Segoe UI Variable, Segoe UI"
+                           FontSize="12"
+                           Foreground="{StaticResource ThemeText}"
+                           VerticalAlignment="Center"
+                           Margin="16,0,0,0" />
+
+                <!-- Window control buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="MinimizeButton"
+                            Click="MinimizeButton_Click"
+                            Style="{StaticResource WindowControlButtonStyle}"
+                            Content="─"
+                            ToolTip="Minimize" />
+                    <Button x:Name="MaximizeButton"
+                            Click="MaximizeButton_Click"
+                            Style="{StaticResource WindowControlButtonStyle}"
+                            Content="□"
+                            ToolTip="Maximize" />
+                    <Button x:Name="CloseButton"
+                            Click="CloseButton_Click"
+                            Style="{StaticResource WindowCloseButtonStyle}"
+                            Content="✕"
+                            ToolTip="Close" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ════════════════════════════════════════
+              HEADER
+              ════════════════════════════════════════ -->
+        <Border Grid.Row="1"
                 Background="{StaticResource ThemeSurface}"
                 BorderBrush="{StaticResource ThemeBorder}"
                 BorderThickness="0,0,0,1"
                 Padding="20,12,24,12">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="56" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="68" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
                 <!-- App title -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -65,7 +122,7 @@
         <!-- ════════════════════════════════════════
              MAIN CONTENT — Sidebar + Content Area
              ════════════════════════════════════════ -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <!-- Sidebar -->
                 <ColumnDefinition Width="Auto" />
@@ -76,17 +133,44 @@
             <!-- ──── SIDEBAR ──── -->
             <Border Grid.Column="0" Style="{StaticResource SidebarStyle}">
                     <StackPanel Orientation="Vertical" Margin="0,8,0,0">
-                        <!-- Devices / Device List -->
+                        <!-- Devices -->
                         <Button Command="{Binding NavigateToViewCommand}"
                                 CommandParameter="Devices"
                                 ToolTip="{DynamicResource NavDevices}"
                                 Style="{StaticResource SidebarButtonStyle}">
-                            <Viewbox Width="22" Height="22">
-                                <Canvas Width="24" Height="24">
-                                    <Path Data="{x:Static local:IconGeometries.DevicesIcon}"
-                                          Fill="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Devices}" />
-                                </Canvas>
-                            </Viewbox>
+                            <StackPanel>
+                                <Viewbox Width="22" Height="22">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="{x:Static local:IconGeometries.DevicesIcon}"
+                                              Fill="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Devices}" />
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Text="{DynamicResource NavDevices}"
+                                           FontSize="9"
+                                           Foreground="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Devices}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Audio -->
+                        <Button Command="{Binding NavigateToViewCommand}"
+                                CommandParameter="Audio"
+                                ToolTip="{DynamicResource NavAudio}"
+                                Style="{StaticResource SidebarButtonStyle}">
+                            <StackPanel>
+                                <Viewbox Width="22" Height="22">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="{x:Static local:IconGeometries.AudioQualityIcon}"
+                                              Fill="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Audio}" />
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Text="{DynamicResource NavAudio}"
+                                           FontSize="9"
+                                           Foreground="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Audio}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,2,0,0" />
+                            </StackPanel>
                         </Button>
 
                         <!-- Settings -->
@@ -94,38 +178,19 @@
                                 CommandParameter="Settings"
                                 ToolTip="{DynamicResource NavSettings}"
                                 Style="{StaticResource SidebarButtonStyle}">
-                            <Viewbox Width="22" Height="22">
-                                <Canvas Width="24" Height="24">
-                                    <Path Data="{x:Static local:IconGeometries.SettingsIcon}"
-                                          Fill="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Settings}" />
-                                </Canvas>
-                            </Viewbox>
-                        </Button>
-
-                        <!-- History -->
-                        <Button Command="{Binding NavigateToViewCommand}"
-                                CommandParameter="History"
-                                ToolTip="{DynamicResource NavHistory}"
-                                Style="{StaticResource SidebarButtonStyle}">
-                            <Viewbox Width="22" Height="22">
-                                <Canvas Width="24" Height="24">
-                                    <Path Data="{x:Static local:IconGeometries.HistoryIcon}"
-                                          Fill="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=History}" />
-                                </Canvas>
-                            </Viewbox>
-                        </Button>
-
-                        <!-- Mini mode -->
-                        <Rectangle Height="1" Fill="{StaticResource ThemeBorder}" Margin="6,8,6,8" />
-                        <Button Command="{Binding ToggleCompactModeCommand}"
-                                ToolTip="{DynamicResource CompactModeTooltip}"
-                                Style="{StaticResource SidebarButtonStyle}">
-                            <Viewbox Width="20" Height="20">
-                                <Canvas Width="24" Height="24">
-                                    <Path Data="{x:Static local:IconGeometries.MiniModeIcon}"
-                                          Fill="{Binding IsCompactMode, Converter={StaticResource BoolToBrushConverter}}" />
-                                </Canvas>
-                            </Viewbox>
+                            <StackPanel>
+                                <Viewbox Width="22" Height="22">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="{x:Static local:IconGeometries.SettingsIcon}"
+                                              Fill="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Settings}" />
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Text="{DynamicResource NavSettings}"
+                                           FontSize="9"
+                                           Foreground="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Settings}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,2,0,0" />
+                            </StackPanel>
                         </Button>
                     </StackPanel>
             </Border>
@@ -353,26 +418,332 @@
                                     </Button>
                                 </StackPanel>
                             </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
 
-                            <!-- ── AUTO-RECONNECT CARD ── -->
+                <!-- ═══ AUDIO VIEW ═══ -->
+                <Grid Visibility="{Binding CurrentView, Converter={StaticResource ViewTypeToVisibilityConverter}, ConverterParameter=Audio}"
+                      Margin="20,16,20,12">
+                    <ScrollViewer Style="{StaticResource ModernScrollViewerStyle}"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Auto">
+                        <StackPanel>
+
+                            <!-- ── CODEC SELECTION CARD ── -->
                             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="{DynamicResource AutoReconnect}"
-                                                   Style="{StaticResource BodyTextStyle}"
-                                                   FontWeight="SemiBold" />
-                                        <TextBlock Text="{DynamicResource AutoReconnectDesc}"
-                                                   Style="{StaticResource SmallTextStyle}" />
-                                    </StackPanel>
-                                    <ToggleButton Grid.Column="1"
-                                                  IsChecked="{Binding AutoReconnect}"
-                                                  Style="{StaticResource ToggleSwitchStyle}"
-                                                  VerticalAlignment="Center" />
-                                </Grid>
+                                <StackPanel>
+                                    <TextBlock Text="{DynamicResource SettingsCodec}"
+                                               Style="{StaticResource SubheadingTextStyle}"
+                                               Margin="0,0,0,12" />
+                                    <WrapPanel Margin="0,0,0,8">
+                                        <Button Content="{DynamicResource CodecAuto}"
+                                                Command="{Binding SelectCodecCommand}"
+                                                CommandParameter="{x:Static models:PreferredCodec.Auto}"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.Codec}" Value="{x:Static models:PreferredCodec.Auto}">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="{DynamicResource CodecSBC}"
+                                                Command="{Binding SelectCodecCommand}"
+                                                CommandParameter="{x:Static models:PreferredCodec.SBC}"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.Codec}" Value="{x:Static models:PreferredCodec.SBC}">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="{DynamicResource CodecAAC}"
+                                                Command="{Binding SelectCodecCommand}"
+                                                CommandParameter="{x:Static models:PreferredCodec.AAC}"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.Codec}" Value="{x:Static models:PreferredCodec.AAC}">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="{DynamicResource CodecAptX}"
+                                                Command="{Binding SelectCodecCommand}"
+                                                CommandParameter="{x:Static models:PreferredCodec.AptX}"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.Codec}" Value="{x:Static models:PreferredCodec.AptX}">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="{DynamicResource CodecLDAC}"
+                                                Command="{Binding SelectCodecCommand}"
+                                                CommandParameter="{x:Static models:PreferredCodec.LDAC}"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.Codec}" Value="{x:Static models:PreferredCodec.LDAC}">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- ── BITRATE CARD ── -->
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="{DynamicResource SettingsBitrate}"
+                                               Style="{StaticResource SubheadingTextStyle}"
+                                               Margin="0,0,0,12" />
+                                    <WrapPanel Margin="0,0,0,4">
+                                        <Button Content="Auto"
+                                                Command="{Binding SelectBitrateCommand}"
+                                                CommandParameter="Auto"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="Auto">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="128k"
+                                                Command="{Binding SelectBitrateCommand}"
+                                                CommandParameter="128k"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="128k">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="256k"
+                                                Command="{Binding SelectBitrateCommand}"
+                                                CommandParameter="256k"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="256k">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="320k"
+                                                Command="{Binding SelectBitrateCommand}"
+                                                CommandParameter="320k"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="320k">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="512k"
+                                                Command="{Binding SelectBitrateCommand}"
+                                                CommandParameter="512k"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="512k">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="990k"
+                                                Command="{Binding SelectBitrateCommand}"
+                                                CommandParameter="990k"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.Bitrate}" Value="990k">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- ── SAMPLE RATE CARD ── -->
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="{DynamicResource SettingsSampleRate}"
+                                               Style="{StaticResource SubheadingTextStyle}"
+                                               Margin="0,0,0,12" />
+                                    <WrapPanel Margin="0,0,0,4">
+                                        <Button Content="44100 Hz"
+                                                Command="{Binding SelectSampleRateCommand}"
+                                                CommandParameter="44100"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.SampleRate}" Value="44100">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="48000 Hz"
+                                                Command="{Binding SelectSampleRateCommand}"
+                                                CommandParameter="48000"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.SampleRate}" Value="48000">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- ── TRANSMISSION MODE CARD ── -->
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="{DynamicResource SettingsTransmission}"
+                                               Style="{StaticResource SubheadingTextStyle}"
+                                               Margin="0,0,0,12" />
+                                    <WrapPanel Margin="0,0,0,4">
+                                        <Button Content="{DynamicResource ModeBalanced}"
+                                                Command="{Binding SelectTransmissionModeCommand}"
+                                                CommandParameter="{x:Static models:TransmissionMode.Balanced}"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.TransmissionMode}" Value="{x:Static models:TransmissionMode.Balanced}">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="{DynamicResource ModeBestQuality}"
+                                                Command="{Binding SelectTransmissionModeCommand}"
+                                                CommandParameter="{x:Static models:TransmissionMode.BestQuality}"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.TransmissionMode}" Value="{x:Static models:TransmissionMode.BestQuality}">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="{DynamicResource ModeLowLatency}"
+                                                Command="{Binding SelectTransmissionModeCommand}"
+                                                CommandParameter="{x:Static models:TransmissionMode.LowLatency}"
+                                                Margin="0,0,8,8">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource OptionChipStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CodecSettings.TransmissionMode}" Value="{x:Static models:TransmissionMode.LowLatency}">
+                                                            <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </WrapPanel>
+                                </StackPanel>
                             </Border>
 
                             <!-- ── QUALITY GUIDE CARD ── -->
@@ -416,88 +787,13 @@
                 <!-- ═══ SETTINGS VIEW ═══ -->
                 <views:SettingsPanel Visibility="{Binding CurrentView, Converter={StaticResource ViewTypeToVisibilityConverter}, ConverterParameter=Settings}" />
 
-                <!-- ═══ HISTORY VIEW ═══ -->
-                <views:HistoryPanel Visibility="{Binding CurrentView, Converter={StaticResource ViewTypeToVisibilityConverter}, ConverterParameter=History}" />
-
-                <!-- ═══ COMPACT MODE OVERLAY ═══ -->
-                <Border Style="{StaticResource CompactOverlayStyle}"
-                        Visibility="{Binding IsCompactMode, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                        <!-- Large status indicator -->
-                        <Ellipse Width="32" Height="32"
-                                 HorizontalAlignment="Center"
-                                 Margin="0,0,0,12"
-                                 Fill="{Binding ConnectionState, Converter={StaticResource ConnectionStateToColorConverter}}" />
-
-                        <!-- Device name (or prompt) -->
-                        <TextBlock Text="{Binding SelectedDevice.Name}"
-                                   Style="{StaticResource CompactDeviceNameStyle}" />
-
-                        <!-- Codec / quality info -->
-                        <TextBlock Text="{Binding CodecDisplayText, TargetNullValue=''}"
-                                   Style="{StaticResource CompactCodecStyle}"
-                                   Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibilityConverter}}" />
-
-                        <!-- Connection state -->
-                        <TextBlock Text="{Binding ConnectionStateText}"
-                                   FontSize="12"
-                                   Foreground="{StaticResource ThemeTextSecondary}"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,6,0,0" />
-
-                        <!-- Volume in compact mode -->
-                        <StackPanel Margin="0,20,0,0" HorizontalAlignment="Stretch">
-                            <Grid Margin="0,0,0,6">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0"
-                                           Text="{DynamicResource VolumeTitle}"
-                                           FontSize="12"
-                                           Foreground="{StaticResource ThemeTextSecondary}" />
-                                <TextBlock Grid.Column="1"
-                                           FontSize="12"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource ThemeText}">
-                                    <TextBlock.Text>
-                                        <Binding Path="Volume" StringFormat="{}{0:P0}" />
-                                    </TextBlock.Text>
-                                </TextBlock>
-                            </Grid>
-                            <Slider Value="{Binding Volume, Mode=TwoWay}"
-                                    Minimum="0" Maximum="1"
-                                    TickFrequency="0.01"
-                                    IsSnapToTickEnabled="False"
-                                    Height="28" />
-                        </StackPanel>
-
-                        <!-- Mute + Disconnect row -->
-                        <StackPanel Orientation="Horizontal"
-                                    HorizontalAlignment="Center"
-                                    Margin="0,20,0,0">
-                            <Button Command="{Binding ToggleMuteCommand}"
-                                    Content="{DynamicResource Mute}"
-                                    Style="{StaticResource GhostButtonStyle}"
-                                    Height="34" Padding="16,0"
-                                    FontSize="12"
-                                    Margin="0,0,8,0" />
-                            <Button Command="{Binding ToggleCompactModeCommand}"
-                                    Content="{DynamicResource CompactModeExit}"
-                                    Style="{StaticResource ConnectButtonStyle}"
-                                    Height="34" Padding="16,0"
-                                    FontSize="12" />
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-
             </Grid>
         </Grid>
 
         <!-- ════════════════════════════════════════
              STATUS BAR
              ════════════════════════════════════════ -->
-        <Border Grid.Row="2"
+        <Border Grid.Row="3"
                 Background="{StaticResource ThemeSurfaceAlt}"
                 BorderBrush="{StaticResource ThemeBorder}"
                 BorderThickness="0,1,0,0"
@@ -519,7 +815,8 @@
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <!-- Signal strength bars -->
+                    <!-- Connection indicator bars (show connection state, not
+                         signal strength — WinRT does not expose RSSI) -->
                     <StackPanel Orientation="Horizontal"
                                 VerticalAlignment="Center"
                                 Height="16">
@@ -527,38 +824,22 @@
                                    RadiusX="1" RadiusY="1"
                                    VerticalAlignment="Bottom"
                                    Margin="1,0"
-                                   Fill="{StaticResource BrushStatusConnected}">
-                            <Rectangle.Opacity>
-                                <Binding Path="SignalStrengthPercent" Converter="{StaticResource PercentToSignalOpacityConverter}" ConverterParameter="1" />
-                            </Rectangle.Opacity>
-                        </Rectangle>
+                                   Fill="{Binding IsConnected, Converter={StaticResource BoolToBrushConverter}}" />
                         <Rectangle Width="3" Height="10"
                                    RadiusX="1" RadiusY="1"
                                    VerticalAlignment="Bottom"
                                    Margin="1,0"
-                                   Fill="{StaticResource BrushStatusConnected}">
-                            <Rectangle.Opacity>
-                                <Binding Path="SignalStrengthPercent" Converter="{StaticResource PercentToSignalOpacityConverter}" ConverterParameter="2" />
-                            </Rectangle.Opacity>
-                        </Rectangle>
+                                   Fill="{Binding IsConnected, Converter={StaticResource BoolToBrushConverter}}" />
                         <Rectangle Width="3" Height="14"
                                    RadiusX="1" RadiusY="1"
                                    VerticalAlignment="Bottom"
                                    Margin="1,0"
-                                   Fill="{StaticResource BrushStatusConnected}">
-                            <Rectangle.Opacity>
-                                <Binding Path="SignalStrengthPercent" Converter="{StaticResource PercentToSignalOpacityConverter}" ConverterParameter="3" />
-                            </Rectangle.Opacity>
-                        </Rectangle>
+                                   Fill="{Binding IsConnected, Converter={StaticResource BoolToBrushConverter}}" />
                         <Rectangle Width="3" Height="16"
                                    RadiusX="1" RadiusY="1"
                                    VerticalAlignment="Bottom"
                                    Margin="1,0,4,0"
-                                   Fill="{StaticResource BrushStatusConnected}">
-                            <Rectangle.Opacity>
-                                <Binding Path="SignalStrengthPercent" Converter="{StaticResource PercentToSignalOpacityConverter}" ConverterParameter="4" />
-                            </Rectangle.Opacity>
-                        </Rectangle>
+                                   Fill="{Binding IsConnected, Converter={StaticResource BoolToBrushConverter}}" />
                     </StackPanel>
 
                     <!-- Codec / quality text -->

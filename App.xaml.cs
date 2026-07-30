@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Windows;
 using System.Windows.Threading;
 using AkiLink.Services;
@@ -7,14 +9,15 @@ namespace AkiLink;
 
 public partial class App : Application
 {
+    private ServiceProvider? _serviceProvider;
     private IBluetoothAudioService? _btService;
     private IAudioVolumeService? _volumeService;
+    private ISettingsService? _settingsService;
     private MainViewModel? _viewModel;
     private SystemTrayService? _trayService;
 
     public App()
     {
-        // Global exception handlers for diagnostics
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
         TaskScheduler.UnobservedTaskException += OnTaskUnobservedException;
@@ -29,10 +32,17 @@ public partial class App : Application
             // Initialize localization (loads en-US by default)
             _ = LocalizationService.Instance;
 
-            // Build dependency graph
-            _volumeService = new AudioVolumeService();
-            _btService = new BluetoothAudioService();
-            _viewModel = new MainViewModel(_btService, _volumeService);
+            // Build DI container
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            _serviceProvider = services.BuildServiceProvider();
+
+            // Resolve services from DI
+            _volumeService = _serviceProvider.GetRequiredService<IAudioVolumeService>();
+            _btService = _serviceProvider.GetRequiredService<IBluetoothAudioService>();
+            _settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
+
+            _viewModel = _serviceProvider.GetRequiredService<MainViewModel>();
 
             // Create main window
             var mainWindow = new MainWindow
@@ -41,7 +51,9 @@ public partial class App : Application
             };
 
             // System tray
-            _trayService = new SystemTrayService(mainWindow);
+            _trayService = new SystemTrayService(
+                mainWindow,
+                _serviceProvider.GetService<ILogger<SystemTrayService>>());
             _trayService.Initialize();
 
             mainWindow.Show();
@@ -67,27 +79,59 @@ public partial class App : Application
         }
     }
 
+    private static void ConfigureServices(IServiceCollection services)
+    {
+        services.AddLogging(builder =>
+        {
+            builder.AddDebug();
+            builder.SetMinimumLevel(LogLevel.Information);
+        });
+
+        services.AddSingleton<IBluetoothPlatform, WinRtBluetoothPlatform>();
+        services.AddSingleton<IBluetoothAudioService, BluetoothAudioService>();
+        services.AddSingleton<IAudioVolumeService, AudioVolumeService>();
+        services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddTransient<MainViewModel>();
+    }
+
     protected override void OnExit(ExitEventArgs e)
     {
+        // Save any pending settings before teardown
+        _viewModel?.SaveSettings();
+
         _trayService?.Dispose();
         (_btService as IDisposable)?.Dispose();
+        (_settingsService as IDisposable)?.Dispose();
+        _serviceProvider?.Dispose();
         base.OnExit(e);
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        System.Diagnostics.Debug.WriteLine($"[AkiLink] Dispatcher exception: {e.Exception}");
+        var logger = _serviceProvider?.GetService<ILogger<App>>();
+        if (logger is not null)
+            logger.LogError(e.Exception, "Dispatcher exception");
+        else
+            System.Diagnostics.Debug.WriteLine($"[AkiLink] Dispatcher exception: {e.Exception}");
         e.Handled = true;
     }
 
     private void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        System.Diagnostics.Debug.WriteLine($"[AkiLink] AppDomain unhandled: {e.ExceptionObject}");
+        var logger = _serviceProvider?.GetService<ILogger<App>>();
+        if (logger is not null)
+            logger.LogError("AppDomain unhandled: {ExceptionObject}", e.ExceptionObject);
+        else
+            System.Diagnostics.Debug.WriteLine($"[AkiLink] AppDomain unhandled: {e.ExceptionObject}");
     }
 
     private void OnTaskUnobservedException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        System.Diagnostics.Debug.WriteLine($"[AkiLink] Task unobserved exception: {e.Exception?.InnerException}");
+        var logger = _serviceProvider?.GetService<ILogger<App>>();
+        if (logger is not null)
+            logger.LogError(e.Exception?.InnerException, "Task unobserved exception");
+        else
+            System.Diagnostics.Debug.WriteLine($"[AkiLink] Task unobserved exception: {e.Exception?.InnerException}");
         e.SetObserved();
     }
 }

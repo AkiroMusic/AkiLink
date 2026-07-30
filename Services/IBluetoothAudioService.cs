@@ -13,7 +13,7 @@ public interface IBluetoothAudioService : IDisposable
     event Action<ConnectionQuality>? QualityUpdated;
 
     Task<IReadOnlyList<DeviceInformation>> ScanDevicesAsync();
-    Task<bool> ConnectAsync(string deviceId);
+    Task<bool> ConnectAsync(string deviceId, CancellationToken cancellationToken = default);
     void Disconnect();
     Task StartAutoReconnectAsync(string deviceId);
     void StopAutoReconnect();

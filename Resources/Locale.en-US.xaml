@@ -8,8 +8,8 @@
 
     <!-- ════════════ Sidebar Navigation ════════════ -->
     <sys:String x:Key="NavDevices">Devices</sys:String>
+    <sys:String x:Key="NavAudio">Audio</sys:String>
     <sys:String x:Key="NavSettings">Settings</sys:String>
-    <sys:String x:Key="NavHistory">History</sys:String>
 
     <!-- ════════════ Devices Panel ════════════ -->
     <sys:String x:Key="DevicesTitle">Devices</sys:String>
@@ -29,6 +29,8 @@
     <sys:String x:Key="StatusConnecting">Connecting...</sys:String>
     <sys:String x:Key="AutoReconnect">Auto-Reconnect</sys:String>
     <sys:String x:Key="AutoReconnectDesc">Automatically reconnect to last device</sys:String>
+    <sys:String x:Key="CloseToTray">Close to Tray</sys:String>
+    <sys:String x:Key="CloseToTrayDesc">When closing the window, minimize to tray instead of quitting</sys:String>
 
     <!-- ════════════ Volume Panel ════════════ -->
     <sys:String x:Key="VolumeTitle">Volume</sys:String>
@@ -95,8 +97,5 @@
     <sys:String x:Key="TooltipSampleRate">Sample rate determines audio frequency range. 44100 Hz (CD quality) is standard. 48000 Hz is used for video content. Higher rates capture more detail.</sys:String>
     <sys:String x:Key="TooltipTransmission">Transmission mode affects the balance between audio quality and real-time performance. Best Quality may introduce slight latency; Low Latency reduces delay for video/gaming.</sys:String>
 
-    <!-- Compact Mode -->
-    <sys:String x:Key="CompactModeTooltip">Compact Mode</sys:String>
-    <sys:String x:Key="CompactModeExit">Exit Compact Mode</sys:String>
     <sys:String x:Key="CompactNoDevice">No Device Selected</sys:String>
 </ResourceDictionary>

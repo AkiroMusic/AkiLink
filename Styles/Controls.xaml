@@ -820,8 +820,8 @@
                                                  Grid.Row="0"
                                                  Grid.Column="0"
                                                  CanContentScroll="{TemplateBinding CanContentScroll}"
-                                                 CanHorizontallyScroll="False"
-                                                 CanVerticallyScroll="False"
+                                                 CanHorizontallyScroll="True"
+                                                 CanVerticallyScroll="True"
                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
                                                  Content="{TemplateBinding Content}"
                                                  Margin="{TemplateBinding Padding}" />
@@ -1044,18 +1044,18 @@
 
     <!-- Sidebar container -->
     <Style TargetType="Border" x:Key="SidebarStyle">
-        <Setter Property="Width" Value="56" />
-        <Setter Property="MinWidth" Value="56" />
+        <Setter Property="Width" Value="68" />
+        <Setter Property="MinWidth" Value="68" />
         <Setter Property="Background" Value="{StaticResource ThemeSurface}" />
         <Setter Property="BorderBrush" Value="{StaticResource ThemeBorder}" />
         <Setter Property="BorderThickness" Value="0,0,1,0" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 
-    <!-- Sidebar nav button -->
+    <!-- Sidebar nav button - supports both icons and icon+text content -->
     <Style TargetType="Button" x:Key="SidebarButtonStyle">
-        <Setter Property="Width" Value="56" />
-        <Setter Property="Height" Value="48" />
+        <Setter Property="Width" Value="68" />
+        <Setter Property="Height" Value="54" />
         <Setter Property="Background" Value="{StaticResource BrushTransparent}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Cursor" Value="Hand" />
@@ -1069,7 +1069,7 @@
                                 Width="2"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Stretch"
-                                Margin="0,6,0,6"
+                                Margin="0,4,0,4"
                                 CornerRadius="0,2,2,0"
                                 Background="{StaticResource ThemePrimary}"
                                 Opacity="0" />
@@ -1266,37 +1266,8 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="20,16" />
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
-        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
-    </Style>
-
-    <!-- ═══════════════════════════════════════════
-         COMPACT MODE OVERLAY
-         Small always-on-top style overlay showing
-         essential info when compact mode is active.
-         ═══════════════════════════════════════════ -->
-
-    <Style TargetType="Border" x:Key="CompactOverlayStyle">
-        <Setter Property="Background" Value="{StaticResource ThemeSurface}" />
-        <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="Padding" Value="24,20" />
-        <Setter Property="SnapsToDevicePixels" Value="True" />
-    </Style>
-
-    <!-- Compact mode device info text -->
-    <Style TargetType="TextBlock" x:Key="CompactDeviceNameStyle">
-        <Setter Property="FontSize" Value="18" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
-        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-        <Setter Property="HorizontalAlignment" Value="Center" />
-    </Style>
-
-    <Style TargetType="TextBlock" x:Key="CompactCodecStyle">
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="Foreground" Value="{StaticResource ThemeTextSecondary}" />
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="Margin" Value="0,4,0,0" />
     </Style>
 
     <!-- ═══════════════════════════════════════════
@@ -1325,6 +1296,78 @@
         <Setter Property="Foreground" Value="{StaticResource ThemeTextSecondary}" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Margin" Value="12,0,0,0" />
+    </Style>
+
+    <!-- ═══════════════════════════════════════════
+         WINDOW CONTROL BUTTON STYLES
+         For custom title bar minimize/maximize/close
+         ═══════════════════════════════════════════ -->
+
+    <!-- Base style for window caption buttons (minimize/maximize) -->
+    <Style TargetType="Button" x:Key="WindowControlButtonStyle">
+        <Setter Property="Width" Value="46" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Background" Value="{StaticResource BrushTransparent}" />
+        <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="RootBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="0"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="False" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="RootBorder" Property="Background"
+                                    Value="{StaticResource ThemeSurface2}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="RootBorder" Property="Background"
+                                    Value="{StaticResource ThemeBorder}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Close button style — red hover like Windows 11 -->
+    <Style TargetType="Button" x:Key="WindowCloseButtonStyle"
+           BasedOn="{StaticResource WindowControlButtonStyle}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="RootBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="0"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="False" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="RootBorder" Property="Background"
+                                    Value="#E81123" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="RootBorder" Property="Background"
+                                    Value="#F1707A" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

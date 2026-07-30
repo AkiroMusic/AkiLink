@@ -8,8 +8,8 @@
 
     <!-- ════════════ Sidebar Navigation ════════════ -->
     <sys:String x:Key="NavDevices">设备</sys:String>
+    <sys:String x:Key="NavAudio">音质</sys:String>
     <sys:String x:Key="NavSettings">设置</sys:String>
-    <sys:String x:Key="NavHistory">历史</sys:String>
 
     <!-- ════════════ Devices Panel ════════════ -->
     <sys:String x:Key="DevicesTitle">设备列表</sys:String>
@@ -29,6 +29,8 @@
     <sys:String x:Key="StatusConnecting">连接中...</sys:String>
     <sys:String x:Key="AutoReconnect">自动重连</sys:String>
     <sys:String x:Key="AutoReconnectDesc">自动重连上次连接的设备</sys:String>
+    <sys:String x:Key="CloseToTray">关闭到托盘</sys:String>
+    <sys:String x:Key="CloseToTrayDesc">关闭窗口时最小化到托盘而非退出程序，音频持续播放</sys:String>
 
     <!-- ════════════ Volume Panel ════════════ -->
     <sys:String x:Key="VolumeTitle">音量</sys:String>
@@ -95,8 +97,8 @@
     <sys:String x:Key="TooltipSampleRate">采样率决定音频频率范围。44100 Hz（CD 音质）为标准。48000 Hz 用于视频内容。更高的采样率捕捉更多细节。</sys:String>
     <sys:String x:Key="TooltipTransmission">传输模式影响音质与实时性能之间的平衡。最佳音质可能引入轻微延迟；低延迟模式减少视频/游戏场景的延迟。</sys:String>
 
-    <!-- Compact Mode -->
-    <sys:String x:Key="CompactModeTooltip">精简模式</sys:String>
-    <sys:String x:Key="CompactModeExit">退出精简模式</sys:String>
-    <sys:String x:Key="CompactNoDevice">未选择设备</sys:String>
+    <sys:String x:Key="ModeAuto">自动</sys:String>
+    <sys:String x:Key="BitrateAuto">自动</sys:String>
+    <sys:String x:Key="SampleRate44100">44100 Hz</sys:String>
+    <sys:String x:Key="SampleRate48000">48000 Hz</sys:String>
 </ResourceDictionary>
