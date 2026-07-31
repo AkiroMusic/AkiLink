@@ -72,7 +72,7 @@ AkiLink/
 │   └── SettingsPanel.xaml.cs
 ├── tests/               # Unit tests (xUnit + Moq)
 │   └── AkiLink.Tests/
-│       └── MainViewModelTests.cs   # 38 tests
+│       └── MainViewModelTests.cs   # 39 tests
 ├── App.xaml             # Application entry + resources
 ├── App.xaml.cs          # Startup / shutdown orchestration
 ├── IconGeometries.cs    # SVG path data for sidebar icons
@@ -126,6 +126,7 @@ dotnet test ./tests/AkiLink.Tests
 
 ## Version History
 
+- **v1.1.3** — Fix volume slider fighting user input: CoreAudio callbacks now filter out the app's own volume/mute changes via a dedicated `AppEventContext` GUID (dragging the slider is no longer echoed back and snapped); the slider also gets explicit `SmallChange="0.01"` / `LargeChange="0.1"` — WPF defaults both to `1.0`, which with `Maximum=1` made one track click jump straight to 0% or 100%. Track hit-area enlarged 4px → 32px, and the track background is now declared before the Track so the 4px bar renders behind the 16px thumb circle instead of crossing through it. Verified with a COM-level probe, an end-to-end event harness, and a WPF command probe (track click ±10%, keyboard ±1%, zero echo-back).
 - **v1.1.2** — Fix Bluetooth reconnect loops and device corruption: serialized connection teardown (`TrackDispose` / `WaitForPendingDisposeAsync`) so a new `AudioPlaybackConnection` is never created while the previous one is still alive; bounded blocking teardown on shutdown to prevent half-open A2DP links; exponential backoff (5s → 60s cap) in the auto-reconnect loop to avoid the known Windows 11 fastfail from repeated `StartAsync` calls. Verified on real hardware with 10 connect/disconnect cycles — device name integrity preserved, clean shutdown, zero errors in the Windows event log.
 - **v1.1.1** — Fix settings clobbering at startup (partial defaults like `Volume=0` / `Language=en-US` were persisted over saved values) and fix the crash when launching with `isMuted:true`: `IAudioEndpointVolume` reordered to native vtable order, and all CoreAudio COM interfaces now use `[ComImport]` + `[InterfaceType(InterfaceIsIUnknown)]` + `[PreserveSig]` so the CCW callback vtable is built from interface declaration order (fixes native access violations in `audioses.dll` after `OnNotify`, see dotnet/runtime#127512).
 - **v1.1** — 3-tab sidebar layout, DI container, settings persistence, custom title bar.
@@ -214,6 +215,7 @@ dotnet test
 
 ## 版本历史
 
+- **v1.1.3** — 修复音量滑块与用户输入"打架"：CoreAudio 回调现在通过专属 `AppEventContext` GUID 过滤掉应用自身的音量/静音变更（拖动滑块不再被回调回写导致回弹）；滑块同时显式设置 `SmallChange="0.01"` / `LargeChange="0.1"` —— WPF 默认两者均为 `1.0`，在 `Maximum=1` 时一次点击轨道会直接跳到 0% 或 100%。轨道点击区域从 4px 加高到 32px，且轨道背景改为在 Track 之前声明，使 4px 横条渲染在 16px 圆点之后而非穿过圆点。经 COM 层探针、端到端事件夹具、WPF 命令探针三重实证（点击轨道 ±10%、键盘 ±1%、零回声回写）。
 - **v1.1.2** — 修复蓝牙重连循环与设备损坏：连接 teardown 串行化（`TrackDispose` / `WaitForPendingDisposeAsync`），确保新的 `AudioPlaybackConnection` 绝不在上一个仍存活时创建；退出时有限阻塞等待 teardown 完成，防止 A2DP 半开链路；自动重连循环加入指数退避（5s → 60s 封顶），避免重复 `StartAsync` 触发的 Windows 11 已知 fastfail 崩溃。真机验证 10 轮连接/断开：设备名完整、退出无残留、Windows 事件日志零错误。
 - **v1.1.1** — 修复启动时设置被覆盖（`Volume=0` / `Language=en-US` 等部分默认值在启动时覆盖已保存设置），并修复 `isMuted:true` 启动崩溃：`IAudioEndpointVolume` 按本机 vtable 顺序重排，所有 CoreAudio COM 接口改用 `[ComImport]` + `[InterfaceType(InterfaceIsIUnknown)]` + `[PreserveSig]`，使 CCW 回调 vtable 按接口声明顺序构建（修复 `audioses.dll` 在 `OnNotify` 返回后的本机访问冲突，见 dotnet/runtime#127512）。
 - **v1.1** — 三栏侧边栏布局、DI 容器、设置持久化、自定义标题栏。
