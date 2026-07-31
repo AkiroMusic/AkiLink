@@ -393,8 +393,58 @@ public class MainViewModelTests
         Assert.Equal("Disconnected", _viewModel.ConnectionStateText);
     }
 
-    // ─── History Commands (RED tests — fail before implementation) ──────
+    // ─── Settings Persistence (RED tests — fail before implementation) ──
 
+    [Fact]
+    public void Constructor_LoadsSavedNonDefaultSettings_WithoutPersistingDuringLoad()
+    {
+        // Arrange — user's real persisted settings from a previous session
+        var saved = new AppSettings
+        {
+            Codec = "AAC",
+            Bitrate = "Adaptive",
+            SampleRate = 48000,
+            TransmissionMode = "LowLatency",
+            Volume = 0.4f,
+            IsMuted = true,
+            AutoReconnect = true,
+            CloseToTray = true,
+            Language = "zh-CN"
+        };
+        _settingsMock.Setup(x => x.Load()).Returns(saved);
+
+        // Act
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object);
+
+        // Assert — RED: the constructor currently persists partially-loaded defaults
+        // (Volume=0, Language=en-US) during construction/load, clobbering saved values.
+        _settingsMock.Verify(x => x.Save(It.IsAny<AppSettings>()), Times.Never);
+
+        // Loaded values must still be applied to the VM (regression guard)
+        Assert.Equal(0.4f, vm.Volume);
+        Assert.True(vm.IsMuted);
+        Assert.True(vm.AutoReconnect);
+        Assert.True(vm.CloseToTray);
+        Assert.Equal(PreferredCodec.AAC, vm.CodecSettings.Codec);
+        Assert.Equal(48000, vm.CodecSettings.SampleRate);
+    }
+
+    [Fact]
+    public void Constructor_WithAllDefaultSettings_DoesNotSaveDuringConstruction()
+    {
+        // Arrange — settings match defaults; nothing should be persisted at startup
+        _settingsMock.Setup(x => x.Load()).Returns(new AppSettings());
+
+        // Act
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object);
+
+        // Assert — RED: OnCodecSettingsChanged fires when CodecSettings is initialized,
+        // persisting defaults to disk even though nothing changed.
+        _settingsMock.Verify(x => x.Save(It.IsAny<AppSettings>()), Times.Never);
+        Assert.Equal(0.75f, vm.Volume);
+    }
+
+    // ─── History Commands (RED tests — fail before implementation) ──────
     [Fact]
     public void ClearHistory_ShowsConfirmation_BeforeClearing()
     {

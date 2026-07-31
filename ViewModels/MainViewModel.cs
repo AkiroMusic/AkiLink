@@ -26,6 +26,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IDialogService? _dialogService;
     private bool _isUpdatingVolume;
     private bool _isUpdatingMuted;
+    private bool _isLoadingSettings;
     private float _savedVolume = 0.75f;
     private bool _savedIsMuted;
 
@@ -36,6 +37,12 @@ public partial class MainViewModel : ObservableObject
         _settingsService = settingsService;
         _dialogService = dialogService;
 
+        // Suppress SaveSettings() while initializing and loading persisted settings.
+        // Without this guard, property-change handlers fire during construction and
+        // persist partially-loaded defaults (Volume=0, Language=en-US) over the
+        // user's saved values — clobbering settings on every launch.
+        _isLoadingSettings = true;
+
         Devices = new ObservableCollection<BluetoothDeviceInfo>();
         ConnectionHistory = new ObservableCollection<ConnectionHistoryEntry>();
         ConnectionHistory.CollectionChanged += (_, _) => HasHistory = ConnectionHistory.Count > 0;
@@ -44,6 +51,7 @@ public partial class MainViewModel : ObservableObject
         {
             // Real-time sync: when any codec sub-property changes (codec, bitrate,
             // sample rate, transmission mode), push to the service and persist.
+            if (_isLoadingSettings) return;
             _btService.ConfigureCodec(CodecSettings);
             SaveSettings();
         };
@@ -76,6 +84,7 @@ public partial class MainViewModel : ObservableObject
                     _volumeService.Initialize();
                     Volume = _savedVolume;
                     IsMuted = _savedIsMuted;
+                    _isLoadingSettings = false;
                 }));
         }
         else
@@ -84,6 +93,7 @@ public partial class MainViewModel : ObservableObject
             _volumeService.Initialize();
             Volume = _savedVolume;
             IsMuted = _savedIsMuted;
+            _isLoadingSettings = false;
         }
     }
 
@@ -160,6 +170,7 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnCodecSettingsChanged(AudioCodecSettings value)
     {
+        if (_isLoadingSettings) return;
         _btService.ConfigureCodec(value);
         SaveSettings();
     }
@@ -332,14 +343,14 @@ public partial class MainViewModel : ObservableObject
     {
         if (_isUpdatingVolume) return;
         _volumeService.Volume = value;
-        SaveSettings();
+        if (!_isLoadingSettings) SaveSettings();
     }
 
     partial void OnIsMutedChanged(bool value)
     {
         if (_isUpdatingMuted) return;
         _volumeService.IsMuted = value;
-        SaveSettings();
+        if (!_isLoadingSettings) SaveSettings();
     }
 
     partial void OnAutoReconnectChanged(bool value)
@@ -352,7 +363,7 @@ public partial class MainViewModel : ObservableObject
         {
             _ = _btService.StartAutoReconnectAsync(SelectedDevice.Id);
         }
-        SaveSettings();
+        if (!_isLoadingSettings) SaveSettings();
     }
 
     partial void OnSelectedDeviceChanged(BluetoothDeviceInfo? value)
@@ -362,7 +373,7 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnCloseToTrayChanged(bool value)
     {
-        SaveSettings();
+        if (!_isLoadingSettings) SaveSettings();
     }
 
     // ─── Settings Persistence ───────────────────────────

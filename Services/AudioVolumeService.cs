@@ -28,40 +28,80 @@ namespace AkiLink.Services;
     [Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
     private class MMDeviceEnumerator { }
 
+    // NOTE: All COM interfaces must use [ComImport] + [InterfaceType(InterfaceIsIUnknown)] +
+    // [PreserveSig]. Without [ComImport], the runtime treats the interface as InterfaceIsDual
+    // and builds the CCW (callback) vtable from the managed class method table instead of the
+    // interface declaration order — audioses.dll then dispatches to wrong/null vtable slots,
+    // crashing natively AFTER OnNotify returns (dotnet/runtime#127512 bug family).
     [Guid("A95664D2-9614-4F35-A746-DE8DB63617E6")]
+    [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     private interface IMMDeviceEnumerator
     {
+        [PreserveSig]
         int EnumAudioEndpoints(int dataFlow, int stateMask, out IMMDevice devices);
+        [PreserveSig]
         int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice device);
     }
 
     [Guid("D666063F-1587-4E43-81F1-B948E807363F")]
+    [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     private interface IMMDevice
     {
+        [PreserveSig]
         int Activate(ref Guid iid, int clsCtx, IntPtr activationParams, out IAudioEndpointVolume endpointVolume);
     }
 
     [Guid("5CDF2C82-841E-4546-9722-0CF74078229A")]
+    [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     private interface IAudioEndpointVolume
     {
-        int RegisterControlChangeNotify(IAudioEndpointVolumeCallback callback);
-        int UnregisterControlChangeNotify(IAudioEndpointVolumeCallback callback);
-        int GetMasterVolumeLevel(out float levelDB);
-        int SetMasterVolumeLevel(float levelDB, in Guid eventContext);
-        int GetMasterVolumeLevelScalar(out float level);
-        int SetMasterVolumeLevelScalar(float level, in Guid eventContext);
-        int GetMute(out bool muted);
-        int SetMute(bool muted, in Guid eventContext);
-        int GetVolumeRange(out float min, out float max, out float step);
+        // Methods MUST be declared in native vtable order (slots 3+).
+        // Declaration order == vtable slot, so any shuffle dispatches to the WRONG native method.
+        [PreserveSig]
+        int RegisterControlChangeNotify(IAudioEndpointVolumeCallback callback);     // slot 3
+        [PreserveSig]
+        int UnregisterControlChangeNotify(IAudioEndpointVolumeCallback callback);   // slot 4
+        [PreserveSig]
+        int GetChannelCount(out uint channelCount);                                 // slot 5
+        [PreserveSig]
+        int SetMasterVolumeLevel(float levelDB, in Guid eventContext);              // slot 6
+        [PreserveSig]
+        int SetMasterVolumeLevelScalar(float level, in Guid eventContext);          // slot 7
+        [PreserveSig]
+        int GetMasterVolumeLevel(out float levelDB);                                // slot 8
+        [PreserveSig]
+        int GetMasterVolumeLevelScalar(out float level);                            // slot 9
+        [PreserveSig]
+        int SetChannelVolumeLevel(uint channel, float levelDB, in Guid eventContext);     // slot 10
+        [PreserveSig]
+        int SetChannelVolumeLevelScalar(uint channel, float level, in Guid eventContext); // slot 11
+        [PreserveSig]
+        int GetChannelVolumeLevel(uint channel, out float levelDB);                 // slot 12
+        [PreserveSig]
+        int GetChannelVolumeLevelScalar(uint channel, out float level);             // slot 13
+        [PreserveSig]
+        int SetMute(int muted, in Guid eventContext);                               // slot 14
+        [PreserveSig]
+        int GetMute(out int muted);                                                 // slot 15
+        [PreserveSig]
+        int SetVolumeStep(uint stepDirection);                                      // slot 16
+        [PreserveSig]
+        int GetVolumeStepInfo(out uint step, out uint stepCount);                   // slot 17
+        [PreserveSig]
+        int QueryHardwareSupport(out uint hardwareSupportMask);                     // slot 18
+        [PreserveSig]
+        int GetVolumeRange(out float minDB, out float maxDB, out float incrementDB); // slot 19
     }
 
     [Guid("657804FA-D6AD-4496-8A60-352752AF4F89")]
+    [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     private interface IAudioEndpointVolumeCallback
     {
+        [PreserveSig]
         int OnNotify(IntPtr notifyData);
     }
 
@@ -237,7 +277,7 @@ namespace AkiLink.Services;
         try
         {
             var hr = _endpointVolume.GetMute(out var muted);
-            return hr >= 0 && muted;
+            return hr >= 0 && muted != 0;
         }
         catch
         {
@@ -251,7 +291,9 @@ namespace AkiLink.Services;
             return;
         try
         {
-            _endpointVolume.SetMute(muted, in Guid.Empty);
+            // BOOL is a 4-byte int in the native API; passing `muted ? 1 : 0`
+            // avoids any ambiguity in the interop layer.
+            _endpointVolume.SetMute(muted ? 1 : 0, in Guid.Empty);
         }
         catch
         {
