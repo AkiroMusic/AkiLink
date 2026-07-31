@@ -324,10 +324,10 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ToggleMute()
     {
-        _isUpdatingMuted = true;
+        // OnIsMutedChanged pushes to the service AND persists. Setting the
+        // _isUpdatingMuted guard here would skip BOTH — mute toggles never
+        // reached SaveSettings, so the mute state was lost on restart.
         IsMuted = !IsMuted;
-        _isUpdatingMuted = false;
-        _volumeService.IsMuted = IsMuted;
     }
 
     [RelayCommand]
@@ -384,7 +384,8 @@ public partial class MainViewModel : ObservableObject
 
         if (Enum.TryParse<PreferredCodec>(s.Codec, ignoreCase: true, out var codec))
             CodecSettings.Codec = codec;
-        CodecSettings.Bitrate = s.Bitrate;
+        if (!string.IsNullOrWhiteSpace(s.Bitrate))
+            CodecSettings.Bitrate = s.Bitrate;
         if (s.SampleRate > 0)
             CodecSettings.SampleRate = s.SampleRate;
         if (Enum.TryParse<TransmissionMode>(s.TransmissionMode, ignoreCase: true, out var mode))
@@ -530,6 +531,10 @@ public partial class MainViewModel : ObservableObject
                 _isUpdatingVolume = true;
                 Volume = volume;
                 _isUpdatingVolume = false;
+                // Persist external changes (volume keys, other apps) so the slider
+                // restores the real system value after restart. The guard above only
+                // suppresses the push-back to the service (loop protection), not the save.
+                if (!_isLoadingSettings) SaveSettings();
             });
         }
         catch { /* Suppress exceptions from async void event handlers */ }
@@ -544,6 +549,9 @@ public partial class MainViewModel : ObservableObject
                 _isUpdatingMuted = true;
                 IsMuted = muted;
                 _isUpdatingMuted = false;
+                // Persist external mute changes (media keys, other apps) so the
+                // state survives restart.
+                if (!_isLoadingSettings) SaveSettings();
             });
         }
         catch { /* Suppress exceptions from async void event handlers */ }

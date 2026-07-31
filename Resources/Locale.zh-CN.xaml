@@ -87,6 +87,7 @@
 
     <!-- ════════════ Confirmations ════════════ -->
     <sys:String x:Key="ConfirmClearHistory">确定要清空所有连接历史吗？</sys:String>
+    <sys:String x:Key="ConfirmClearHistoryMessage">此操作将永久删除所有连接历史记录，且无法撤销。</sys:String>
     <sys:String x:Key="ConfirmDisconnect">确定要断开当前设备吗？</sys:String>
     <sys:String x:Key="Yes">是</sys:String>
     <sys:String x:Key="No">否</sys:String>

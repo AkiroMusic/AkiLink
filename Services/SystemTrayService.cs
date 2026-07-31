@@ -131,6 +131,15 @@ public class SystemTrayService : IDisposable
 
     private void QuitApplication()
     {
+        // Mark the window so MainWindow.OnClosing does not intercept the real quit
+        // as a "close to tray" (which would cancel Shutdown and leave an invisible,
+        // icon-less zombie process). The tray icon is disposed by App.OnExit via
+        // SystemTrayService.Dispose().
+        if (_mainWindow is MainWindow mainWindow)
+        {
+            mainWindow.AllowClose = true;
+        }
+
         _taskbarIcon?.Dispose();
         _taskbarIcon = null;
         Application.Current.Shutdown();

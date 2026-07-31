@@ -521,6 +521,87 @@ public class MainViewModelTests
         Assert.False(_viewModel.HasHistory);
     }
 
+    // ─── Settings Persistence (v1.1.4 fixes) ──────────────
+
+    [Fact]
+    public void ToggleMute_PersistsMuteStateToSettings()
+    {
+        _viewModel.ToggleMuteCommand.Execute(null);
+
+        _settingsMock.Verify(x => x.Save(It.Is<AppSettings>(s => s.IsMuted)), Times.AtLeastOnce);
+    }
+
+    [Fact]
+    public async Task ToggleMute_Twice_PersistsBackToOriginal()
+    {
+        _viewModel.ToggleMuteCommand.Execute(null);
+        _viewModel.ToggleMuteCommand.Execute(null);
+
+        _settingsMock.Verify(x => x.Save(It.Is<AppSettings>(s => !s.IsMuted)), Times.AtLeastOnce);
+    }
+
+    [Fact]
+    public async Task ExternalVolumeChange_PersistsToSettings()
+    {
+        _volumeMock.Raise(x => x.VolumeChanged += null, 0.5f);
+
+        _settingsMock.Verify(x => x.Save(It.Is<AppSettings>(s => Math.Abs(s.Volume - 0.5f) < 0.001f)), Times.Once);
+    }
+
+    [Fact]
+    public async Task ExternalMuteChange_PersistsToSettings()
+    {
+        _volumeMock.Raise(x => x.MuteChanged += null, true);
+
+        _settingsMock.Verify(x => x.Save(It.Is<AppSettings>(s => s.IsMuted)), Times.Once);
+    }
+
+    [Fact]
+    public void LoadSettings_WithNullBitrate_KeepsDefaultBitrate()
+    {
+        _settingsMock.Setup(x => x.Load()).Returns(new AppSettings { Bitrate = null! });
+
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object);
+
+        Assert.Equal("Auto", vm.CodecSettings.Bitrate);
+    }
+
+    [Fact]
+    public void LoadSettings_WithWhitespaceBitrate_KeepsDefaultBitrate()
+    {
+        _settingsMock.Setup(x => x.Load()).Returns(new AppSettings { Bitrate = "   " });
+
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object);
+
+        Assert.Equal("Auto", vm.CodecSettings.Bitrate);
+    }
+
+    // ─── Connection History Detail (v1.1.4 fix) ───────────
+
+    [Fact]
+    public void HistoryEntry_HasDetail_WhenDetailPresent_ReturnsTrue()
+    {
+        var entry = new ConnectionHistoryEntry(DateTime.Now, "Device-A", ConnectionEventType.Error, "some detail");
+
+        Assert.True(entry.HasDetail);
+    }
+
+    [Fact]
+    public void HistoryEntry_HasDetail_WhenDetailNull_ReturnsFalse()
+    {
+        var entry = new ConnectionHistoryEntry(DateTime.Now, "Device-A", ConnectionEventType.Connected);
+
+        Assert.False(entry.HasDetail);
+    }
+
+    [Fact]
+    public void HistoryEntry_HasDetail_WhenDetailWhitespace_ReturnsFalse()
+    {
+        var entry = new ConnectionHistoryEntry(DateTime.Now, "Device-A", ConnectionEventType.Connected, "   ");
+
+        Assert.False(entry.HasDetail);
+    }
+
     /// <summary>
     /// Creates a BluetoothDeviceInfo for testing using the test-friendly constructor.
     /// </summary>

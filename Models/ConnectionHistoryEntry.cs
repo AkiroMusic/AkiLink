@@ -28,6 +28,13 @@ public partial class ConnectionHistoryEntry : ObservableObject
     public string? Detail { get; }
 
     /// <summary>
+    /// True when the entry carries a detail line (error message, etc.), used to
+    /// show/hide the detail row. (The Detail string itself cannot be bound to
+    /// BoolToVisibilityConverter — it only handles bool.)
+    /// </summary>
+    public bool HasDetail => !string.IsNullOrWhiteSpace(Detail);
+
+    /// <summary>
     /// Formatted timestamp string for display.
     /// </summary>
     public string TimestampFormatted => Timestamp.ToString("HH:mm:ss");

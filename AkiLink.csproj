@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="AkiLink.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Resources\AkiLink.ico" />
     <Resource Include="Resources\AkiLink.png" />
   </ItemGroup>

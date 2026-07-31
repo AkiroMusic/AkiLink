@@ -218,6 +218,7 @@ namespace AkiLink.Services;
             if (hr < 0 || _device == null)
             {
                 _logger?.LogWarning($"[AkiLink] AudioVolumeService: GetDefaultAudioEndpoint failed (hr=0x{hr:X8})");
+                CleanupCom();
                 return;
             }
 
@@ -227,6 +228,7 @@ namespace AkiLink.Services;
             if (hr < 0 || _endpointVolume == null)
             {
                 _logger?.LogWarning($"[AkiLink] AudioVolumeService: Activate failed (hr=0x{hr:X8})");
+                CleanupCom();
                 return;
             }
 

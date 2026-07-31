@@ -91,6 +91,7 @@ public partial class App : Application
         services.AddSingleton<IBluetoothAudioService, BluetoothAudioService>();
         services.AddSingleton<IAudioVolumeService, AudioVolumeService>();
         services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddSingleton<IDialogService, MessageBoxDialogService>();
         services.AddTransient<MainViewModel>();
     }
 

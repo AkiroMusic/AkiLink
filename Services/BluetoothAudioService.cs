@@ -84,6 +84,12 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
 
     public async Task<bool> ConnectAsync(string deviceId, CancellationToken cancellationToken = default)
     {
+        if (_disposed)
+        {
+            FireError("Cannot connect: service has been disposed.");
+            return false;
+        }
+
         if (string.IsNullOrWhiteSpace(deviceId))
         {
             FireError("Device ID cannot be null or empty.");
@@ -486,7 +492,8 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
     /// <summary>
     /// Waits for any in-flight connection teardown to complete so a new
     /// connection for the same device is never created while the previous
-    /// one is still alive on the Bluetooth stack.
+    /// one is still alive on the Bluetooth stack. Bounded by a timeout so a
+    /// hung dispose cannot stall a reconnect forever.
     /// </summary>
     private async Task WaitForPendingDisposeAsync()
     {
@@ -498,7 +505,15 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
 
         if (pending is null) return;
 
-        try { await pending; } catch { /* best-effort */ }
+        try
+        {
+            var completed = await Task.WhenAny(pending, Task.Delay(TimeSpan.FromSeconds(5)));
+            if (!ReferenceEquals(completed, pending))
+            {
+                FireLog("Timed out waiting for connection teardown before reconnect.");
+            }
+        }
+        catch { /* best-effort */ }
 
         lock (_lock)
         {
@@ -509,30 +524,39 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
 
     private void OnConnectionStateChanged(AudioPlaybackConnection sender, object args)
     {
-        var newState = sender.State;
-        FireLog($"Connection state changed to: {newState}");
-
-        var droppedConnection = false;
-
-        lock (_lock)
+        try
         {
-            // If the connection dropped unexpectedly, clean up our reference.
-            if (newState == AudioPlaybackConnectionState.Closed
-                && ReferenceEquals(_activeConnection, sender))
+            var newState = sender.State;
+            FireLog($"Connection state changed to: {newState}");
+
+            var droppedConnection = false;
+
+            lock (_lock)
             {
-                _activeConnection!.StateChanged -= OnConnectionStateChanged;
-                _activeConnection = null;
-                droppedConnection = true;
+                // If the connection dropped unexpectedly, clean up our reference.
+                if (newState == AudioPlaybackConnectionState.Closed
+                    && ReferenceEquals(_activeConnection, sender))
+                {
+                    _activeConnection!.StateChanged -= OnConnectionStateChanged;
+                    _activeConnection = null;
+                    droppedConnection = true;
+                }
+
+                SetState(newState);
             }
 
-            SetState(newState);
+            // Dispose the dropped connection off the event thread through the
+            // tracked teardown path so a subsequent ConnectAsync waits for it.
+            if (droppedConnection)
+            {
+                TrackDispose(sender);
+            }
         }
-
-        // Dispose the dropped connection off the event thread through the
-        // tracked teardown path so a subsequent ConnectAsync waits for it.
-        if (droppedConnection)
+        catch (Exception ex)
         {
-            TrackDispose(sender);
+            // The connection may have been disposed out from under us mid-event.
+            // Never let an exception escape the WinRT event handler.
+            FireLog($"OnConnectionStateChanged swallowed: {ex.Message}");
         }
     }
 

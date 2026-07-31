@@ -87,6 +87,7 @@
 
     <!-- ════════════ Confirmations ════════════ -->
     <sys:String x:Key="ConfirmClearHistory">Clear all connection history?</sys:String>
+    <sys:String x:Key="ConfirmClearHistoryMessage">This will permanently delete all connection history entries. This action cannot be undone.</sys:String>
     <sys:String x:Key="ConfirmDisconnect">Disconnect from current device?</sys:String>
     <sys:String x:Key="Yes">Yes</sys:String>
     <sys:String x:Key="No">No</sys:String>
