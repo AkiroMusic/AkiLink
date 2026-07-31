@@ -107,12 +107,13 @@ The app uses `net10.0-windows10.0.19041.0` to access WinRT APIs (`Windows.Device
 
 ## Testing
 
-38 unit tests covering:
+39 unit tests covering:
 
 - Constructor initialization and service subscription
 - Device scanning states (success, failure, empty results)
 - Connection lifecycle (connect, disconnect, auto-reconnect)
 - Volume and mute synchronization (guard against infinite loops)
+- Settings persistence (loads saved non-default settings without clobbering them at startup)
 - Connection history (clear with confirmation, delete entry, HasHistory tracking)
 - Codec settings propagation
 - `CanExecute` logic for connect/disconnect buttons
@@ -122,6 +123,13 @@ Run with:
 ```bash
 dotnet test ./tests/AkiLink.Tests
 ```
+
+## Version History
+
+- **v1.1.2** — Fix Bluetooth reconnect loops and device corruption: serialized connection teardown (`TrackDispose` / `WaitForPendingDisposeAsync`) so a new `AudioPlaybackConnection` is never created while the previous one is still alive; bounded blocking teardown on shutdown to prevent half-open A2DP links; exponential backoff (5s → 60s cap) in the auto-reconnect loop to avoid the known Windows 11 fastfail from repeated `StartAsync` calls. Verified on real hardware with 10 connect/disconnect cycles — device name integrity preserved, clean shutdown, zero errors in the Windows event log.
+- **v1.1.1** — Fix settings clobbering at startup (partial defaults like `Volume=0` / `Language=en-US` were persisted over saved values) and fix the crash when launching with `isMuted:true`: `IAudioEndpointVolume` reordered to native vtable order, and all CoreAudio COM interfaces now use `[ComImport]` + `[InterfaceType(InterfaceIsIUnknown)]` + `[PreserveSig]` so the CCW callback vtable is built from interface declaration order (fixes native access violations in `audioses.dll` after `OnNotify`, see dotnet/runtime#127512).
+- **v1.1** — 3-tab sidebar layout, DI container, settings persistence, custom title bar.
+- **v1.0** — Initial release.
 
 ## Tech Stack
 
@@ -203,3 +211,10 @@ dotnet test
 | 系统托盘 | Hardcodet.NotifyIcon.Wpf |
 | 测试框架 | xUnit + Moq |
 | 图标工具 | ImageMagick (PNG → ICO) |
+
+## 版本历史
+
+- **v1.1.2** — 修复蓝牙重连循环与设备损坏：连接 teardown 串行化（`TrackDispose` / `WaitForPendingDisposeAsync`），确保新的 `AudioPlaybackConnection` 绝不在上一个仍存活时创建；退出时有限阻塞等待 teardown 完成，防止 A2DP 半开链路；自动重连循环加入指数退避（5s → 60s 封顶），避免重复 `StartAsync` 触发的 Windows 11 已知 fastfail 崩溃。真机验证 10 轮连接/断开：设备名完整、退出无残留、Windows 事件日志零错误。
+- **v1.1.1** — 修复启动时设置被覆盖（`Volume=0` / `Language=en-US` 等部分默认值在启动时覆盖已保存设置），并修复 `isMuted:true` 启动崩溃：`IAudioEndpointVolume` 按本机 vtable 顺序重排，所有 CoreAudio COM 接口改用 `[ComImport]` + `[InterfaceType(InterfaceIsIUnknown)]` + `[PreserveSig]`，使 CCW 回调 vtable 按接口声明顺序构建（修复 `audioses.dll` 在 `OnNotify` 返回后的本机访问冲突，见 dotnet/runtime#127512）。
+- **v1.1** — 三栏侧边栏布局、DI 容器、设置持久化、自定义标题栏。
+- **v1.0** — 初版发布。
