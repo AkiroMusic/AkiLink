@@ -36,6 +36,7 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
 
     private CancellationTokenSource? _autoReconnectCts;
     private string? _autoReconnectDeviceId;
+    private Task? _pendingDisposeTask;
     private bool _disposed;
 
     private readonly ILogger<BluetoothAudioService> _logger;
@@ -104,6 +105,11 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
             if (attempt == 1)
             {
                 DisconnectInternal();
+                // Wait for the previous connection to be fully released before
+                // creating a new one. Overlapping AudioPlaybackConnection
+                // objects for the same device confuse the Bluetooth stack and
+                // trigger reconnect loops.
+                await WaitForPendingDisposeAsync();
             }
 
             AudioPlaybackConnection? connection;
@@ -249,6 +255,7 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
 
         await Task.Run(async () =>
         {
+            var consecutiveFailures = 0;
             while (!token.IsCancellationRequested)
             {
                 try
@@ -269,11 +276,24 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
                         if (devices.Any(d => d.Id.Equals(deviceId, StringComparison.OrdinalIgnoreCase)))
                         {
                             FireLog("Auto-reconnect: target device detected, attempting connection…");
-                            await ConnectAsync(deviceId, token);
+                            var connected = await ConnectAsync(deviceId, token);
+                            consecutiveFailures = connected ? 0 : consecutiveFailures + 1;
+                        }
+                        else
+                        {
+                            consecutiveFailures = 0;
                         }
                     }
+                    else
+                    {
+                        consecutiveFailures = 0;
+                    }
 
-                    await Task.Delay(5000, token);
+                    // Exponential backoff (5s → 10s → 20s → 40s → 60s cap) so a
+                    // detected-but-unconnectable device is not hammered: repeated
+                    // StartAsync calls are a known Windows 11 fastfail crash.
+                    var delayMs = (int)Math.Min(5000 * Math.Pow(2, consecutiveFailures), 60000);
+                    await Task.Delay(delayMs, token);
                 }
                 catch (OperationCanceledException)
                 {
@@ -282,6 +302,7 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
                 catch (Exception ex)
                 {
                     FireLog($"Auto-reconnect loop swallowed: {ex.Message}");
+                    consecutiveFailures++;
                     // Use CancellationToken.None so we don't skip the delay
                     // when cancellation is requested during error recovery.
                     await Task.Delay(5000, CancellationToken.None);
@@ -380,7 +401,39 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
         _disposed = true;
 
         StopAutoReconnect();
-        Disconnect();
+
+        // Block until in-flight teardown completes so the WinRT connection is
+        // actually released before the process exits. Without this, the OS can
+        // keep the A2DP audio link half-open, causing reconnect loops and
+        // device corruption (device renamed / constant connect-disconnect).
+        DisconnectInternal();
+        WaitForPendingDisposeShutdown();
+    }
+
+    /// <summary>
+    /// Synchronously waits (bounded) for the pending connection teardown so the
+    /// process does not exit with a live WinRT connection. Called from the UI
+    /// thread during application shutdown; the teardown itself runs on a
+    /// threadpool thread, so this cannot deadlock the dispatcher.
+    /// </summary>
+    private void WaitForPendingDisposeShutdown()
+    {
+        Task? pending;
+        lock (_lock)
+        {
+            pending = _pendingDisposeTask;
+        }
+
+        if (pending is null) return;
+
+        try
+        {
+            if (!pending.Wait(TimeSpan.FromSeconds(5)))
+            {
+                FireLog("Timed out waiting for connection teardown during shutdown.");
+            }
+        }
+        catch { /* best-effort — process may be shutting down */ }
     }
 
     // ───────────────────── Private helpers ────────────────────────────
@@ -388,6 +441,8 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
     /// <summary>
     /// Tears down the active connection without firing the Closed event
     /// (the caller owns the state transition).  Safe to call multiple times.
+    /// The teardown runs on a background thread and is tracked so a
+    /// subsequent ConnectAsync can wait for it to fully complete.
     /// </summary>
     private void DisconnectInternal()
     {
@@ -402,18 +457,53 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
         if (connection is not null)
         {
             connection.StateChanged -= OnConnectionStateChanged;
-
-            // Dispose on a background (MTA) thread: AudioPlaybackConnection was created
-            // on the MTA via Task.Run in ConnectAsync. Disposing on the WPF STA thread
-            // during shutdown can leave the Bluetooth adapter in an inconsistent state
-            // (intermittent connectivity until reboot).
-            Task.Run(() =>
-            {
-                try { connection.Dispose(); }
-                catch { /* best-effort — process may be shutting down */ }
-            });
-
+            TrackDispose(connection);
             FireLog("Active audio connection torn down.");
+        }
+    }
+
+    /// <summary>
+    /// Disposes a connection on a background (MTA) thread and records the
+    /// operation so callers can await its completion. AudioPlaybackConnection
+    /// is created on the MTA via Task.Run in ConnectAsync; disposing on the
+    /// WPF STA thread during shutdown can leave the Bluetooth adapter in an
+    /// inconsistent state (intermittent connectivity until reboot).
+    /// </summary>
+    private void TrackDispose(AudioPlaybackConnection connection)
+    {
+        var disposeTask = Task.Run(() =>
+        {
+            try { connection.Dispose(); }
+            catch { /* best-effort — process may be shutting down */ }
+        });
+
+        lock (_lock)
+        {
+            _pendingDisposeTask = disposeTask;
+        }
+    }
+
+    /// <summary>
+    /// Waits for any in-flight connection teardown to complete so a new
+    /// connection for the same device is never created while the previous
+    /// one is still alive on the Bluetooth stack.
+    /// </summary>
+    private async Task WaitForPendingDisposeAsync()
+    {
+        Task? pending;
+        lock (_lock)
+        {
+            pending = _pendingDisposeTask;
+        }
+
+        if (pending is null) return;
+
+        try { await pending; } catch { /* best-effort */ }
+
+        lock (_lock)
+        {
+            if (ReferenceEquals(_pendingDisposeTask, pending))
+                _pendingDisposeTask = null;
         }
     }
 
@@ -422,6 +512,8 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
         var newState = sender.State;
         FireLog($"Connection state changed to: {newState}");
 
+        var droppedConnection = false;
+
         lock (_lock)
         {
             // If the connection dropped unexpectedly, clean up our reference.
@@ -429,11 +521,18 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
                 && ReferenceEquals(_activeConnection, sender))
             {
                 _activeConnection!.StateChanged -= OnConnectionStateChanged;
-                _activeConnection.Dispose();
                 _activeConnection = null;
+                droppedConnection = true;
             }
 
             SetState(newState);
+        }
+
+        // Dispose the dropped connection off the event thread through the
+        // tracked teardown path so a subsequent ConnectAsync waits for it.
+        if (droppedConnection)
+        {
+            TrackDispose(sender);
         }
     }
 
