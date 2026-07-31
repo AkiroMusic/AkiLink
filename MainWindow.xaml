@@ -389,10 +389,16 @@
                                         </TextBlock>
                                     </Grid>
 
-                                    <!-- Volume slider -->
+                                    <!-- Volume slider
+                                         NOTE: SmallChange/LargeChange are REQUIRED because WPF
+                                         defaults both to 1.0. With Maximum=1 that clamps
+                                         LargeChange to the WHOLE range — clicking the track
+                                         once jumps to 0% (DecreaseLarge) or 100% (IncreaseLarge). -->
                                     <Slider Value="{Binding Volume, Mode=TwoWay}"
                                             Minimum="0"
                                             Maximum="1"
+                                            SmallChange="0.01"
+                                            LargeChange="0.1"
                                             Style="{StaticResource ModernSliderStyle}"
                                             TickFrequency="0.01"
                                             IsSnapToTickEnabled="False"

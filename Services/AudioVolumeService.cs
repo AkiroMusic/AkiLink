@@ -20,6 +20,16 @@ namespace AkiLink.Services;
         private const int S_OK = 0;
         private const float DefaultVolume = 0.75f;
 
+    /// <summary>
+    /// Event context GUID passed on every Set* call we make. Windows echoes it back in
+    /// AUDIO_VOLUME_NOTIFICATION_DATA.guidEventContext, letting us distinguish changes
+    /// WE caused from changes made elsewhere (volume keys, other apps).
+    /// Without this, our own SetVolume/SetMute calls trigger OnNotify, whose async
+    /// callback re-writes the slider with a stale/intermediate value and fights the
+    /// user's drag (slider appears to "not respond").
+    /// </summary>
+    private static readonly Guid AppEventContext = new("A41B6E8C-2D3F-4A5B-9C7D-8E1F0A2B3C4D");
+
     private static readonly Guid IID_IAudioEndpointVolume =
         new("5CDF2C82-841E-4546-9722-0CF74078229A");
 
@@ -121,9 +131,9 @@ namespace AkiLink.Services;
     [ClassInterface(ClassInterfaceType.None)]
     private sealed class AudioEndpointVolumeCallbackImpl : IAudioEndpointVolumeCallback
     {
-        private Action<float, bool>? _onNotification;
+        private Action<float, bool, Guid>? _onNotification;
 
-        public AudioEndpointVolumeCallbackImpl(Action<float, bool> onNotification)
+        public AudioEndpointVolumeCallbackImpl(Action<float, bool, Guid> onNotification)
         {
             _onNotification = onNotification;
         }
@@ -142,7 +152,7 @@ namespace AkiLink.Services;
             try
             {
                 var data = Marshal.PtrToStructure<AUDIO_VOLUME_NOTIFICATION_DATA>(notifyData);
-                handler(data.fMasterVolume, data.bMuted != 0);
+                handler(data.fMasterVolume, data.bMuted != 0, data.guidEventContext);
             }
             catch
             {
@@ -262,7 +272,8 @@ namespace AkiLink.Services;
         try
         {
             level = Math.Clamp(level, 0f, 1f);
-            _endpointVolume.SetMasterVolumeLevelScalar(level, in Guid.Empty);
+            var ctx = AppEventContext; // local copy: `in` can't reference a static field safely
+            _endpointVolume.SetMasterVolumeLevelScalar(level, in ctx);
         }
         catch
         {
@@ -293,7 +304,8 @@ namespace AkiLink.Services;
         {
             // BOOL is a 4-byte int in the native API; passing `muted ? 1 : 0`
             // avoids any ambiguity in the interop layer.
-            _endpointVolume.SetMute(muted ? 1 : 0, in Guid.Empty);
+            var ctx = AppEventContext; // local copy: `in` can't reference a static field safely
+            _endpointVolume.SetMute(muted ? 1 : 0, in ctx);
         }
         catch
         {
@@ -301,15 +313,23 @@ namespace AkiLink.Services;
         }
     }
 
-    private void OnVolumeNotification(float volume, bool muted)
+    private void OnVolumeNotification(float volume, bool muted, Guid eventContext)
     {
+        // Skip notifications caused by OUR OWN SetVolume/SetMute calls. The eventContext
+        // we pass on every Set* call is echoed back by Windows in the notification data,
+        // so we can tell our own changes apart from external ones (volume keys, other apps).
+        // Without this filter the async callback re-writes Volume with a stale/intermediate
+        // value while the user is dragging the slider — the slider appears unresponsive.
+        if (eventContext == AppEventContext)
+            return;
+
         // Dispatch to the WPF UI thread so consumers can update bindings safely
         var dispatcher = Application.Current?.Dispatcher;
         if (dispatcher != null && !dispatcher.CheckAccess())
         {
             try
             {
-                dispatcher.BeginInvoke(() => OnVolumeNotification(volume, muted));
+                dispatcher.BeginInvoke(() => OnVolumeNotification(volume, muted, eventContext));
                 return;
             }
             catch
