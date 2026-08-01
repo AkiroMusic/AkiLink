@@ -23,4 +23,8 @@ public static Geometry HistoryIcon { get; } = Geometry.Parse(
 /// <summary>Equalizer / audio quality icon</summary>
 public static Geometry AudioQualityIcon { get; } = Geometry.Parse(
     "M3,21 L3,9 L7,9 L7,21 L3,21 Z M9,21 L9,3 L13,3 L13,21 L9,21 Z M15,21 L15,13 L19,13 L19,21 L15,21 Z");
+
+/// <summary>Five-point star icon for background decoration</summary>
+public static Geometry StarIcon { get; } = Geometry.Parse(
+    "M12 2l2.6 5.3L20 8l-4 3.9.9 5.5L12 14.5 7.1 17.4 8 11.9 4 8l5.4-.7z");
 }
