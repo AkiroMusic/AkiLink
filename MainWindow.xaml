@@ -19,6 +19,152 @@
                             CornerRadius="0" />
     </shell:WindowChrome.WindowChrome>
 
+    <Window.Triggers>
+        <!-- Subtle animated star background: staggered scale pulse + opacity
+             twinkle so the stars drift in and out of phase. -->
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <!-- Star 0: scale pulse -->
+                    <DoubleAnimation Storyboard.TargetName="Star0Scale"
+                                     Storyboard.TargetProperty="ScaleX"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:0" Duration="0:0:4"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star0Scale"
+                                     Storyboard.TargetProperty="ScaleY"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:0" Duration="0:0:4"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star0"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0.08" To="0.20"
+                                     BeginTime="0:0:0" Duration="0:0:4"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+
+                    <!-- Star 1 -->
+                    <DoubleAnimation Storyboard.TargetName="Star1Scale"
+                                     Storyboard.TargetProperty="ScaleX"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:1.5" Duration="0:0:5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star1Scale"
+                                     Storyboard.TargetProperty="ScaleY"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:1.5" Duration="0:0:5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star1"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0.08" To="0.20"
+                                     BeginTime="0:0:1.5" Duration="0:0:5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+
+                    <!-- Star 2 -->
+                    <DoubleAnimation Storyboard.TargetName="Star2Scale"
+                                     Storyboard.TargetProperty="ScaleX"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:0.8" Duration="0:0:3.5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star2Scale"
+                                     Storyboard.TargetProperty="ScaleY"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:0.8" Duration="0:0:3.5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star2"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0.08" To="0.20"
+                                     BeginTime="0:0:0.8" Duration="0:0:3.5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+
+                    <!-- Star 3 -->
+                    <DoubleAnimation Storyboard.TargetName="Star3Scale"
+                                     Storyboard.TargetProperty="ScaleX"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:2.2" Duration="0:0:4.5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star3Scale"
+                                     Storyboard.TargetProperty="ScaleY"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:2.2" Duration="0:0:4.5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star3"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0.08" To="0.20"
+                                     BeginTime="0:0:2.2" Duration="0:0:4.5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+
+                    <!-- Star 4 -->
+                    <DoubleAnimation Storyboard.TargetName="Star4Scale"
+                                     Storyboard.TargetProperty="ScaleX"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:1" Duration="0:0:6"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star4Scale"
+                                     Storyboard.TargetProperty="ScaleY"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:1" Duration="0:0:6"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star4"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0.08" To="0.20"
+                                     BeginTime="0:0:1" Duration="0:0:6"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+
+                    <!-- Star 5 -->
+                    <DoubleAnimation Storyboard.TargetName="Star5Scale"
+                                     Storyboard.TargetProperty="ScaleX"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:0.3" Duration="0:0:4"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star5Scale"
+                                     Storyboard.TargetProperty="ScaleY"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:0.3" Duration="0:0:4"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star5"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0.08" To="0.20"
+                                     BeginTime="0:0:0.3" Duration="0:0:4"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+
+                    <!-- Star 6 -->
+                    <DoubleAnimation Storyboard.TargetName="Star6Scale"
+                                     Storyboard.TargetProperty="ScaleX"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:1.8" Duration="0:0:3"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star6Scale"
+                                     Storyboard.TargetProperty="ScaleY"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:1.8" Duration="0:0:3"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star6"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0.08" To="0.20"
+                                     BeginTime="0:0:1.8" Duration="0:0:3"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+
+                    <!-- Star 7 -->
+                    <DoubleAnimation Storyboard.TargetName="Star7Scale"
+                                     Storyboard.TargetProperty="ScaleX"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:2.5" Duration="0:0:5.5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star7Scale"
+                                     Storyboard.TargetProperty="ScaleY"
+                                     From="0.85" To="1.15"
+                                     BeginTime="0:0:2.5" Duration="0:0:5.5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                    <DoubleAnimation Storyboard.TargetName="Star7"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0.08" To="0.20"
+                                     BeginTime="0:0:2.5" Duration="0:0:5.5"
+                                     AutoReverse="True" RepeatBehavior="Forever" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+
     <Grid>
         <Grid.RowDefinitions>
             <!-- Custom Title Bar -->
@@ -861,5 +1007,101 @@
                 </StackPanel>
             </Grid>
         </Border>
+
+        <!-- ════════════════════════════════════════
+             ANIMATED STAR BACKGROUND
+             (subtle, non-interactive, above content)
+             ════════════════════════════════════════ -->
+        <Grid Grid.RowSpan="4"
+              IsHitTestVisible="False"
+              Margin="0,32,0,0">
+            <Viewbox x:Name="Star0" Width="14" Height="14"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"
+                     Margin="680,180,0,0"
+                     RenderTransformOrigin="0.5,0.5"
+                     Opacity="0.12">
+                <Viewbox.RenderTransform>
+                    <ScaleTransform x:Name="Star0Scale" ScaleX="1" ScaleY="1" />
+                </Viewbox.RenderTransform>
+                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
+            </Viewbox>
+
+            <Viewbox x:Name="Star1" Width="10" Height="10"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"
+                     Margin="740,240,0,0"
+                     RenderTransformOrigin="0.5,0.5"
+                     Opacity="0.12">
+                <Viewbox.RenderTransform>
+                    <ScaleTransform x:Name="Star1Scale" ScaleX="1" ScaleY="1" />
+                </Viewbox.RenderTransform>
+                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
+            </Viewbox>
+
+            <Viewbox x:Name="Star2" Width="9" Height="9"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"
+                     Margin="750,140,0,0"
+                     RenderTransformOrigin="0.5,0.5"
+                     Opacity="0.12">
+                <Viewbox.RenderTransform>
+                    <ScaleTransform x:Name="Star2Scale" ScaleX="1" ScaleY="1" />
+                </Viewbox.RenderTransform>
+                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
+            </Viewbox>
+
+            <Viewbox x:Name="Star3" Width="11" Height="11"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"
+                     Margin="620,300,0,0"
+                     RenderTransformOrigin="0.5,0.5"
+                     Opacity="0.12">
+                <Viewbox.RenderTransform>
+                    <ScaleTransform x:Name="Star3Scale" ScaleX="1" ScaleY="1" />
+                </Viewbox.RenderTransform>
+                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
+            </Viewbox>
+
+            <Viewbox x:Name="Star4" Width="8" Height="8"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"
+                     Margin="560,220,0,0"
+                     RenderTransformOrigin="0.5,0.5"
+                     Opacity="0.12">
+                <Viewbox.RenderTransform>
+                    <ScaleTransform x:Name="Star4Scale" ScaleX="1" ScaleY="1" />
+                </Viewbox.RenderTransform>
+                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
+            </Viewbox>
+
+            <Viewbox x:Name="Star5" Width="12" Height="12"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"
+                     Margin="800,200,0,0"
+                     RenderTransformOrigin="0.5,0.5"
+                     Opacity="0.12">
+                <Viewbox.RenderTransform>
+                    <ScaleTransform x:Name="Star5Scale" ScaleX="1" ScaleY="1" />
+                </Viewbox.RenderTransform>
+                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
+            </Viewbox>
+
+            <Viewbox x:Name="Star6" Width="7" Height="7"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"
+                     Margin="640,120,0,0"
+                     RenderTransformOrigin="0.5,0.5"
+                     Opacity="0.12">
+                <Viewbox.RenderTransform>
+                    <ScaleTransform x:Name="Star6Scale" ScaleX="1" ScaleY="1" />
+                </Viewbox.RenderTransform>
+                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
+            </Viewbox>
+
+            <Viewbox x:Name="Star7" Width="10" Height="10"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"
+                     Margin="520,160,0,0"
+                     RenderTransformOrigin="0.5,0.5"
+                     Opacity="0.12">
+                <Viewbox.RenderTransform>
+                    <ScaleTransform x:Name="Star7Scale" ScaleX="1" ScaleY="1" />
+                </Viewbox.RenderTransform>
+                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
+            </Viewbox>
+        </Grid>
     </Grid>
 </Window>
