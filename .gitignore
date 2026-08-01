@@ -13,6 +13,7 @@ obj/
 
 # Published output
 publish/
+release/
 *.tar.gz
 
 # Temp files

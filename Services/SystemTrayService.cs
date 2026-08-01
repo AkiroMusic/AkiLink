@@ -76,12 +76,16 @@ public class SystemTrayService : IDisposable
             _logger?.LogWarning(ex, "Failed to load icon from embedded resource");
         }
 
-        // Last resort: extract from the assembly (if the .ico is the ApplicationIcon)
+        // Last resort: extract from the app executable (if the .ico is the ApplicationIcon).
+        // Use Environment.ProcessPath — Assembly.Location is empty in single-file publish.
         try
         {
-            var icon = System.Drawing.Icon.ExtractAssociatedIcon(
-                System.Reflection.Assembly.GetExecutingAssembly().Location);
-            if (icon is not null) return icon;
+            var exePath = Environment.ProcessPath;
+            if (exePath is not null)
+            {
+                var icon = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
+                if (icon is not null) return icon;
+            }
         }
         catch (Exception ex)
         {
