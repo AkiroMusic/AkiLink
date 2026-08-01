@@ -165,7 +165,28 @@
         </EventTrigger>
     </Window.Triggers>
 
-    <Grid>
+    <!-- ════════════════════════════════════════
+         WINDOW EDGE FRAME
+         1px hairline (ThemeBorder #313644) around the whole window
+         perimeter, drawn above the content. Collapses to 0 when the
+         window is maximized so the frame never renders as an inner
+         line against the screen edge (WM_GETMINMAXINFO sizes the
+         maximized window to exactly the work area).
+         ════════════════════════════════════════ -->
+    <Border SnapsToDevicePixels="True">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="BorderBrush" Value="{StaticResource ThemeBorder}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
+                                 Value="Maximized">
+                        <Setter Property="BorderThickness" Value="0" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <Grid>
         <Grid.RowDefinitions>
             <!-- Custom Title Bar -->
             <RowDefinition Height="32" />
@@ -1103,5 +1124,6 @@
                 <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
             </Viewbox>
         </Grid>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>
