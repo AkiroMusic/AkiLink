@@ -46,14 +46,21 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Window title -->
-                <TextBlock Grid.Column="0"
-                           Text="AkiLink"
-                           FontFamily="Segoe UI Variable, Segoe UI"
-                           FontSize="12"
-                           Foreground="{StaticResource ThemeText}"
-                           VerticalAlignment="Center"
-                           Margin="16,0,0,0" />
+                <!-- Window title + app icon -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                    <Image Source="pack://application:,,,/Resources/AkiLink.png"
+                           Width="18" Height="18"
+                           Stretch="Uniform"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           Margin="0,0,10,0">
+                        <Image.Clip>
+                            <RectangleGeometry RadiusX="4" RadiusY="4" Rect="0,0,18,18" />
+                        </Image.Clip>
+                    </Image>
+                    <TextBlock Text="AkiLink" FontFamily="Segoe UI Variable, Segoe UI"
+                               FontSize="12" Foreground="{StaticResource ThemeText}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
 
                 <!-- Window control buttons -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
