@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Threading;
 using AkiLink.Services;
@@ -16,6 +17,15 @@ public partial class App : Application
     private MainViewModel? _viewModel;
     private SystemTrayService? _trayService;
 
+    // Held for the entire process lifetime so a second launched instance can
+    // detect us. The OS releases the kernel handle when the process exits, so
+    // there is no leak even though we never dispose it explicitly.
+    private System.Threading.Mutex? _singleInstanceMutex;
+
+    // Mutex identifier for single-instance enforcement. Versioned so a future
+    // incompatible release can force a fresh lock namespace if needed.
+    private const string SingleInstanceMutexName = "AkiLink_SingleInstance_v1";
+
     public App()
     {
         DispatcherUnhandledException += OnDispatcherUnhandledException;
@@ -23,9 +33,51 @@ public partial class App : Application
         TaskScheduler.UnobservedTaskException += OnTaskUnobservedException;
     }
 
+    /// <summary>
+    /// Activates the existing AkiLink main window when a duplicate instance is
+    /// launched. Finds the already-running process, restores + foregrounds its
+    /// main window, then returns so the new instance can shut itself down.
+    /// Best-effort: if activation fails the duplicate instance still exits.
+    /// </summary>
+    private static void ActivateExistingInstance()
+    {
+        try
+        {
+            var processes = System.Diagnostics.Process.GetProcessesByName("AkiLink");
+            foreach (var p in processes)
+            {
+                if (p.MainWindowHandle == IntPtr.Zero) continue;
+
+                NativeMethods.ShowWindow(p.MainWindowHandle, NativeMethods.SW_RESTORE);
+                NativeMethods.SetForegroundWindow(p.MainWindowHandle);
+                break;
+            }
+        }
+        catch
+        {
+            // Best-effort activation — if this fails the duplicate instance still exits.
+        }
+    }
+
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // ─── Single-instance guard ────────────────────────────────────────
+        // A named Mutex is held for the lifetime of the process (stored in a
+        // field, NOT disposed here — `using` would release it as soon as
+        // OnStartup returns and defeat the whole guard). When a second instance
+        // starts and cannot acquire it, we activate the existing window and exit
+        // immediately — no second process, no second tray icon, no conflicting
+        // AudioPlaybackConnection on the same adapter.
+        _singleInstanceMutex = new System.Threading.Mutex(true, SingleInstanceMutexName, out var createdNew);
+        if (!createdNew)
+        {
+            ActivateExistingInstance();
+            Shutdown();
+            return;
+        }
+        // ──────────────────────────────────────────────────────────────────
 
         try
         {
@@ -135,4 +187,20 @@ public partial class App : Application
             System.Diagnostics.Debug.WriteLine($"[AkiLink] Task unobserved exception: {e.Exception?.InnerException}");
         e.SetObserved();
     }
+}
+
+/// <summary>
+/// Win32 interop helpers used for single-instance window activation.
+/// </summary>
+internal static class NativeMethods
+{
+    /// <summary>Restores a minimized window and brings it to the foreground.</summary>
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    /// <summary>Shows a window using the specified command (SW_RESTORE / SW_SHOW).</summary>
+    [DllImport("user32.dll")]
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    public const int SW_RESTORE = 9;
 }

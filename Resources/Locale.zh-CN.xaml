@@ -59,6 +59,7 @@
 
     <!-- ════════════ Quality Guide ════════════ -->
     <sys:String x:Key="QualityGuideTitle">音质指南</sys:String>
+    <sys:String x:Key="QualityGuideBadge">提示</sys:String>
     <sys:String x:Key="QualityGuideDesc">为获得最佳音质，请将 Windows 播放设备格式设置为：</sys:String>
     <sys:String x:Key="QualityGuideSetting1">24 位，48000 Hz（录音室音质）</sys:String>
     <sys:String x:Key="QualityGuideSetting2">24 位，44100 Hz</sys:String>

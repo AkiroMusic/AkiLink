@@ -108,11 +108,12 @@ The app uses `net10.0-windows10.0.19041.0` to access WinRT APIs (`Windows.Device
 
 ## Testing
 
-54 unit tests covering:
+65 unit tests covering:
 
 - Constructor initialization and service subscription
 - Device scanning states (success, failure, empty results)
 - Connection lifecycle (connect, disconnect, auto-reconnect)
+- Per-device connection state (connected flag set/cleared on the device that actually holds the connection)
 - Volume and mute synchronization (guard against infinite loops)
 - Settings persistence (loads saved non-default settings without clobbering them at startup)
 - Mute/volume changes persist to settings (toggle mute, external volume/mute changes)
@@ -129,6 +130,7 @@ dotnet test ./tests/AkiLink.Tests
 
 ## Version History
 
+- **v1.1.5** — Single-instance guard + UI polish: a named Mutex held for the process lifetime enforces one running instance — launching a second instance restores + foregrounds the existing window and exits, eliminating duplicate processes, duplicate tray icons, and conflicting `AudioPlaybackConnection`s on the same adapter; the header bar (app title + connection status) was removed for a more compact layout; the decorative star background lost its animation (the entire `<Window.Triggers>` storyboard and per-star scale transforms were deleted) and the 8 stars now sit static in the bottom-right at 0.12 opacity; the device list shows a per-device "connected" status row (green dot + label + realtime codec), tracked via a dedicated `_connectedDevice` field so the flag clears correctly even when the selection changes between connect and disconnect (4 new tests); the Quality Guide card was redesigned as a flat informational panel with a left accent rail and a TIP badge (new `QualityGuideBadge` key, EN + ZH); scrollbars were slimmed (6px → 3px, thumb 24px → 12px) and the settings list no longer stretches its content horizontally.
 - **v1.1.4** — Fix 10 audit findings: tray "Quit" no longer leaves a zombie window (real exit via `AllowClose` gate); mute toggles and external volume/mute changes now persist to settings; settings writes are coalesced onto a background thread with atomic file replacement (no more per-slider-delta synchronous disk I/O on the UI thread) plus a synchronous flush on exit; history detail rows render when an error message is present (`HasDetail`); maximize now respects the secondary monitor's work area; CoreAudio COM objects are released on every init failure path (no RCW leaks); `BluetoothAudioService` gained a disposed guard, a defensive try/catch in the state handler, and a bounded dispose-wait timeout; history-clear confirmation is localized (EN + ZH); the Win11 compatibility GUID is documented (Windows 11 shares the Windows 10 GUID). Also wired `IDialogService` into DI and added 15 new unit tests (48 MainViewModel + 6 SettingsService) for the persistence and coalescing behavior.
 - **v1.1.3** — Fix volume slider fighting user input: CoreAudio callbacks now filter out the app's own volume/mute changes via a dedicated `AppEventContext` GUID (dragging the slider is no longer echoed back and snapped); the slider also gets explicit `SmallChange="0.01"` / `LargeChange="0.1"` — WPF defaults both to `1.0`, which with `Maximum=1` made one track click jump straight to 0% or 100%. Track hit-area enlarged 4px → 32px, and the track background is now declared before the Track so the 4px bar renders behind the 16px thumb circle instead of crossing through it. Verified with a COM-level probe, an end-to-end event harness, and a WPF command probe (track click ±10%, keyboard ±1%, zero echo-back).
 - **v1.1.2** — Fix Bluetooth reconnect loops and device corruption: serialized connection teardown (`TrackDispose` / `WaitForPendingDisposeAsync`) so a new `AudioPlaybackConnection` is never created while the previous one is still alive; bounded blocking teardown on shutdown to prevent half-open A2DP links; exponential backoff (5s → 60s cap) in the auto-reconnect loop to avoid the known Windows 11 fastfail from repeated `StartAsync` calls. Verified on real hardware with 10 connect/disconnect cycles — device name integrity preserved, clean shutdown, zero errors in the Windows event log.
@@ -219,6 +221,7 @@ dotnet test
 
 ## 版本历史
 
+- **v1.1.5** — 单实例守卫 + UI 打磨：通过进程生命周期持有的命名 Mutex 强制单实例运行 —— 再次启动时会恢复并置前已有窗口后退出，杜绝重复进程、重复托盘图标以及同一适配器上冲突的 `AudioPlaybackConnection`；移除头部栏（应用标题 + 连接状态），布局更紧凑；装饰性星星背景去掉动画（整段 `<Window.Triggers>` 故事板与每颗星的缩放变换已删除），8 颗星改为固定在右下角、0.12 透明度静态显示；设备列表新增每设备"已连接"状态行（绿点 + 标签 + 实时编码），通过独立的 `_connectedDevice` 字段追踪，即使连接与断开之间切换了选中设备也能正确清除标志（新增 4 个测试）；音质指南卡片重设计为扁平信息面板（左侧强调色竖条 + TIP 徽章，新增 `QualityGuideBadge` 键，中英双语）；滚动条瘦身（6px → 3px，滑块 24px → 12px），设置列表内容不再水平拉伸。
 - **v1.1.4** — 修复 10 项审计问题：托盘"退出"不再残留僵尸窗口（通过 `AllowClose` 门控实现真正退出）；静音切换与外部音量/静音变更现在都会持久化；设置写入合并到后台线程并以原子方式替换文件（拖动滑块不再逐次同步写盘阻塞 UI 线程），退出时同步落盘；历史记录含错误详情时详情行正常渲染（`HasDetail`）；最大化时尊重副显示器工作区；CoreAudio COM 对象在每条初始化失败路径上都会释放（无 RCW 泄漏）；`BluetoothAudioService` 增加已释放保护、状态处理器防御性 try/catch 与有界的 teardown 等待超时；清空历史的确认提示已完成中英文本地化；补充 Windows 11 兼容 GUID 说明（Win11 与 Win10 共用同一 GUID）。同时将 `IDialogService` 接入 DI，并新增 15 个单元测试（48 个 MainViewModel + 6 个 SettingsService）覆盖持久化与合并写盘行为。
 - **v1.1.3** — 修复音量滑块与用户输入"打架"：CoreAudio 回调现在通过专属 `AppEventContext` GUID 过滤掉应用自身的音量/静音变更（拖动滑块不再被回调回写导致回弹）；滑块同时显式设置 `SmallChange="0.01"` / `LargeChange="0.1"` —— WPF 默认两者均为 `1.0`，在 `Maximum=1` 时一次点击轨道会直接跳到 0% 或 100%。轨道点击区域从 4px 加高到 32px，且轨道背景改为在 Track 之前声明，使 4px 横条渲染在 16px 圆点之后而非穿过圆点。经 COM 层探针、端到端事件夹具、WPF 命令探针三重实证（点击轨道 ±10%、键盘 ±1%、零回声回写）。
 - **v1.1.2** — 修复蓝牙重连循环与设备损坏：连接 teardown 串行化（`TrackDispose` / `WaitForPendingDisposeAsync`），确保新的 `AudioPlaybackConnection` 绝不在上一个仍存活时创建；退出时有限阻塞等待 teardown 完成，防止 A2DP 半开链路；自动重连循环加入指数退避（5s → 60s 封顶），避免重复 `StartAsync` 触发的 Windows 11 已知 fastfail 崩溃。真机验证 10 轮连接/断开：设备名完整、退出无残留、Windows 事件日志零错误。

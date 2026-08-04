@@ -59,6 +59,7 @@
 
     <!-- ════════════ Quality Guide ════════════ -->
     <sys:String x:Key="QualityGuideTitle">Audio Quality Guide</sys:String>
+    <sys:String x:Key="QualityGuideBadge">TIP</sys:String>
     <sys:String x:Key="QualityGuideDesc">For best audio quality, set your Windows playback device format to:</sys:String>
     <sys:String x:Key="QualityGuideSetting1">24-bit, 48000 Hz (Studio Quality)</sys:String>
     <sys:String x:Key="QualityGuideSetting2">24-bit, 44100 Hz</sys:String>

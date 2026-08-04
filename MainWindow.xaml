@@ -19,151 +19,6 @@
                             CornerRadius="0" />
     </shell:WindowChrome.WindowChrome>
 
-    <Window.Triggers>
-        <!-- Subtle animated star background: staggered scale pulse + opacity
-             twinkle so the stars drift in and out of phase. -->
-        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-            <BeginStoryboard>
-                <Storyboard>
-                    <!-- Star 0: scale pulse -->
-                    <DoubleAnimation Storyboard.TargetName="Star0Scale"
-                                     Storyboard.TargetProperty="ScaleX"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:0" Duration="0:0:4"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star0Scale"
-                                     Storyboard.TargetProperty="ScaleY"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:0" Duration="0:0:4"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star0"
-                                     Storyboard.TargetProperty="Opacity"
-                                     From="0.08" To="0.20"
-                                     BeginTime="0:0:0" Duration="0:0:4"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-
-                    <!-- Star 1 -->
-                    <DoubleAnimation Storyboard.TargetName="Star1Scale"
-                                     Storyboard.TargetProperty="ScaleX"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:1.5" Duration="0:0:5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star1Scale"
-                                     Storyboard.TargetProperty="ScaleY"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:1.5" Duration="0:0:5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star1"
-                                     Storyboard.TargetProperty="Opacity"
-                                     From="0.08" To="0.20"
-                                     BeginTime="0:0:1.5" Duration="0:0:5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-
-                    <!-- Star 2 -->
-                    <DoubleAnimation Storyboard.TargetName="Star2Scale"
-                                     Storyboard.TargetProperty="ScaleX"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:0.8" Duration="0:0:3.5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star2Scale"
-                                     Storyboard.TargetProperty="ScaleY"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:0.8" Duration="0:0:3.5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star2"
-                                     Storyboard.TargetProperty="Opacity"
-                                     From="0.08" To="0.20"
-                                     BeginTime="0:0:0.8" Duration="0:0:3.5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-
-                    <!-- Star 3 -->
-                    <DoubleAnimation Storyboard.TargetName="Star3Scale"
-                                     Storyboard.TargetProperty="ScaleX"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:2.2" Duration="0:0:4.5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star3Scale"
-                                     Storyboard.TargetProperty="ScaleY"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:2.2" Duration="0:0:4.5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star3"
-                                     Storyboard.TargetProperty="Opacity"
-                                     From="0.08" To="0.20"
-                                     BeginTime="0:0:2.2" Duration="0:0:4.5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-
-                    <!-- Star 4 -->
-                    <DoubleAnimation Storyboard.TargetName="Star4Scale"
-                                     Storyboard.TargetProperty="ScaleX"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:1" Duration="0:0:6"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star4Scale"
-                                     Storyboard.TargetProperty="ScaleY"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:1" Duration="0:0:6"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star4"
-                                     Storyboard.TargetProperty="Opacity"
-                                     From="0.08" To="0.20"
-                                     BeginTime="0:0:1" Duration="0:0:6"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-
-                    <!-- Star 5 -->
-                    <DoubleAnimation Storyboard.TargetName="Star5Scale"
-                                     Storyboard.TargetProperty="ScaleX"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:0.3" Duration="0:0:4"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star5Scale"
-                                     Storyboard.TargetProperty="ScaleY"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:0.3" Duration="0:0:4"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star5"
-                                     Storyboard.TargetProperty="Opacity"
-                                     From="0.08" To="0.20"
-                                     BeginTime="0:0:0.3" Duration="0:0:4"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-
-                    <!-- Star 6 -->
-                    <DoubleAnimation Storyboard.TargetName="Star6Scale"
-                                     Storyboard.TargetProperty="ScaleX"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:1.8" Duration="0:0:3"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star6Scale"
-                                     Storyboard.TargetProperty="ScaleY"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:1.8" Duration="0:0:3"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star6"
-                                     Storyboard.TargetProperty="Opacity"
-                                     From="0.08" To="0.20"
-                                     BeginTime="0:0:1.8" Duration="0:0:3"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-
-                    <!-- Star 7 -->
-                    <DoubleAnimation Storyboard.TargetName="Star7Scale"
-                                     Storyboard.TargetProperty="ScaleX"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:2.5" Duration="0:0:5.5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star7Scale"
-                                     Storyboard.TargetProperty="ScaleY"
-                                     From="0.85" To="1.15"
-                                     BeginTime="0:0:2.5" Duration="0:0:5.5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                    <DoubleAnimation Storyboard.TargetName="Star7"
-                                     Storyboard.TargetProperty="Opacity"
-                                     From="0.08" To="0.20"
-                                     BeginTime="0:0:2.5" Duration="0:0:5.5"
-                                     AutoReverse="True" RepeatBehavior="Forever" />
-                </Storyboard>
-            </BeginStoryboard>
-        </EventTrigger>
-    </Window.Triggers>
 
     <!-- ════════════════════════════════════════
          WINDOW EDGE FRAME
@@ -190,8 +45,6 @@
         <Grid.RowDefinitions>
             <!-- Custom Title Bar -->
             <RowDefinition Height="32" />
-            <!-- Header -->
-            <RowDefinition Height="Auto" />
             <!-- Main content (sidebar + content area) -->
             <RowDefinition Height="*" />
             <!-- Status bar -->
@@ -251,52 +104,9 @@
         </Border>
 
         <!-- ════════════════════════════════════════
-              HEADER
-              ════════════════════════════════════════ -->
-        <Border Grid.Row="1"
-                Background="{StaticResource ThemeSurface}"
-                BorderBrush="{StaticResource ThemeBorder}"
-                BorderThickness="0,0,0,1"
-                Padding="20,12,24,12">
-            <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="68" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                <!-- App title -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="{DynamicResource AppTitle}"
-                               Style="{StaticResource HeadingTextStyle}"
-                               FontSize="22"
-                               VerticalAlignment="Center" />
-                    <TextBlock Text="{DynamicResource AppSubtitle}"
-                               Style="{StaticResource CaptionTextStyle}"
-                               VerticalAlignment="Center"
-                               Margin="12,2,0,0" />
-                </StackPanel>
-
-                <!-- Connection status indicator -->
-                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Ellipse Width="10" Height="10"
-                             VerticalAlignment="Center"
-                             Fill="{Binding ConnectionState, Converter={StaticResource ConnectionStateToColorConverter}}" />
-                    <TextBlock Text="{Binding ConnectionStateText}"
-                               FontSize="13"
-                               FontWeight="SemiBold"
-                               VerticalAlignment="Center"
-                               Margin="8,0,0,0"
-                               Foreground="{Binding ConnectionState, Converter={StaticResource ConnectionStateToColorConverter}}" />
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- ════════════════════════════════════════
              MAIN CONTENT — Sidebar + Content Area
              ════════════════════════════════════════ -->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <!-- Sidebar -->
                 <ColumnDefinition Width="Auto" />
@@ -451,13 +261,36 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0">
+                                                <!-- Device name -->
                                                 <TextBlock Text="{Binding Name}"
                                                            FontWeight="SemiBold"
                                                            FontSize="14"
                                                            Foreground="{StaticResource ThemeText}" />
+
+                                                <!-- Status row: connected → dot + label + realtime quality -->
+                                                <StackPanel Orientation="Horizontal"
+                                                            Margin="0,3,0,0"
+                                                            Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <Ellipse Width="8" Height="8"
+                                                             VerticalAlignment="Center"
+                                                             Fill="{StaticResource BrushStatusConnected}" />
+                                                    <TextBlock Text="{DynamicResource StatusConnected}"
+                                                               Style="{StaticResource SmallTextStyle}"
+                                                               Foreground="{StaticResource BrushStatusConnected}"
+                                                               VerticalAlignment="Center"
+                                                               Margin="6,0,0,0" />
+                                                    <TextBlock Text="{Binding DataContext.CodecDisplayText, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                               Style="{StaticResource SmallTextStyle}"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               VerticalAlignment="Center"
+                                                               Margin="8,0,0,0" />
+                                                </StackPanel>
+
+                                                <!-- Status row: not connected → device kind -->
                                                 <TextBlock Text="{Binding Kind}"
                                                            Style="{StaticResource SmallTextStyle}"
-                                                           Margin="0,2,0,0" />
+                                                           Margin="0,3,0,0"
+                                                           Visibility="{Binding IsConnected, Converter={StaticResource InvertedBoolToVisibilityConverter}}" />
                                             </StackPanel>
                                         </Grid>
                                     </DataTemplate>
@@ -608,10 +441,17 @@
                     <ScrollViewer Style="{StaticResource ModernScrollViewerStyle}"
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Auto">
-                        <StackPanel>
+                        <Grid MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ScrollViewer}}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
                             <!-- ── CODEC SELECTION CARD ── -->
-                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                            <Border Style="{StaticResource CardBorderStyle}" Grid.Row="0" Margin="0,0,0,12">
                                 <StackPanel>
                                     <TextBlock Text="{DynamicResource SettingsCodec}"
                                                Style="{StaticResource SubheadingTextStyle}"
@@ -707,7 +547,7 @@
                             </Border>
 
                             <!-- ── BITRATE CARD ── -->
-                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                            <Border Style="{StaticResource CardBorderStyle}" Grid.Row="1" Margin="0,0,0,12">
                                 <StackPanel>
                                     <TextBlock Text="{DynamicResource SettingsBitrate}"
                                                Style="{StaticResource SubheadingTextStyle}"
@@ -820,7 +660,7 @@
                             </Border>
 
                             <!-- ── SAMPLE RATE CARD ── -->
-                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                            <Border Style="{StaticResource CardBorderStyle}" Grid.Row="2" Margin="0,0,0,12">
                                 <StackPanel>
                                     <TextBlock Text="{DynamicResource SettingsSampleRate}"
                                                Style="{StaticResource SubheadingTextStyle}"
@@ -865,7 +705,7 @@
                             </Border>
 
                             <!-- ── TRANSMISSION MODE CARD ── -->
-                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                            <Border Style="{StaticResource CardBorderStyle}" Grid.Row="3" Margin="0,0,0,12">
                                 <StackPanel>
                                     <TextBlock Text="{DynamicResource SettingsTransmission}"
                                                Style="{StaticResource SubheadingTextStyle}"
@@ -926,41 +766,79 @@
                                 </StackPanel>
                             </Border>
 
-                            <!-- ── QUALITY GUIDE CARD ── -->
-                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,0">
-                                <StackPanel>
-                                    <TextBlock Text="{DynamicResource QualityGuideTitle}"
-                                               Style="{StaticResource SubheadingTextStyle}"
-                                               Margin="0,0,0,8" />
-                                    <TextBlock Text="{DynamicResource QualityGuideDesc}"
-                                               Style="{StaticResource SmallTextStyle}"
-                                               TextWrapping="Wrap"
-                                               LineHeight="18" />
-                                    <Border Background="{StaticResource ThemeSurfaceAlt}"
-                                            CornerRadius="6"
-                                            Padding="12,10"
-                                            Margin="0,10,0,0">
-                                        <StackPanel>
-                                            <TextBlock FontWeight="SemiBold"
-                                                       FontSize="13"
-                                                       Foreground="{StaticResource ThemeAccent}">
-                                                <Run Text="{DynamicResource QualityGuideSetting1}" />
-                                            </TextBlock>
-                                            <TextBlock Style="{StaticResource SmallTextStyle}"
-                                                       Margin="0,4,0,0">
-                                                <Run Text="{DynamicResource QualityGuideSetting2}" />
-                                            </TextBlock>
+<!-- ── QUALITY GUIDE CARD ──
+                                  Informational hint panel — visually distinct from the
+                                  adjustable parameter cards above: flat surface, left
+                                  accent rail, badge label, no drop shadow. -->
+                            <Border Grid.Row="4"
+                                    Background="{StaticResource ThemeSurfaceAlt}"
+                                    BorderBrush="{StaticResource ThemeBorder}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Margin="0,0,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Left accent rail -->
+                                    <Border Grid.Column="0"
+                                            Background="{StaticResource ThemeAccent}"
+                                            CornerRadius="2"
+                                            Margin="0,16,0,16" />
+
+                                    <StackPanel Grid.Column="1" Margin="16,14">
+                                        <!-- Header: hint badge + title -->
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                            <Border Background="{StaticResource ThemePrimaryGlass}"
+                                                    CornerRadius="10"
+                                                    Padding="8,2"
+                                                    VerticalAlignment="Center">
+                                                <TextBlock Text="{DynamicResource QualityGuideBadge}"
+                                                           FontSize="10"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{StaticResource ThemePrimary}"
+                                                           VerticalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock Text="{DynamicResource QualityGuideTitle}"
+                                                       Style="{StaticResource SubheadingTextStyle}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="10,0,0,0" />
                                         </StackPanel>
-                                    </Border>
-                                    <TextBlock Text="{DynamicResource QualityGuideHint}"
-                                               Style="{StaticResource SmallTextStyle}"
-                                               TextWrapping="Wrap"
-                                               Margin="0,10,0,0"
-                                               LineHeight="18" />
-                                </StackPanel>
+
+                                        <TextBlock Text="{DynamicResource QualityGuideDesc}"
+                                                   Style="{StaticResource SmallTextStyle}"
+                                                   TextWrapping="Wrap"
+                                                   LineHeight="18" />
+
+                                        <Border Background="{StaticResource ThemeSurface2}"
+                                                CornerRadius="6"
+                                                Padding="12,10"
+                                                Margin="0,10,0,0">
+                                            <StackPanel>
+                                                <TextBlock FontWeight="SemiBold"
+                                                           FontSize="13"
+                                                           Foreground="{StaticResource ThemeAccent}">
+                                                    <Run Text="{DynamicResource QualityGuideSetting1}" />
+                                                </TextBlock>
+                                                <TextBlock Style="{StaticResource SmallTextStyle}"
+                                                           Margin="0,4,0,0">
+                                                    <Run Text="{DynamicResource QualityGuideSetting2}" />
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <TextBlock Text="{DynamicResource QualityGuideHint}"
+                                                   Style="{StaticResource SmallTextStyle}"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,10,0,0"
+                                                   LineHeight="18" />
+                                    </StackPanel>
+                                </Grid>
                             </Border>
 
-                        </StackPanel>
+                        </Grid>
                     </ScrollViewer>
                 </Grid>
 
@@ -973,7 +851,7 @@
         <!-- ════════════════════════════════════════
              STATUS BAR
              ════════════════════════════════════════ -->
-        <Border Grid.Row="3"
+        <Border Grid.Row="2"
                 Background="{StaticResource ThemeSurfaceAlt}"
                 BorderBrush="{StaticResource ThemeBorder}"
                 BorderThickness="0,1,0,0"
@@ -1033,94 +911,62 @@
              ANIMATED STAR BACKGROUND
              (subtle, non-interactive, above content)
              ════════════════════════════════════════ -->
-        <Grid Grid.RowSpan="4"
+        <Grid Grid.RowSpan="3"
               IsHitTestVisible="False"
               Margin="0,32,0,0">
             <Viewbox x:Name="Star0" Width="14" Height="14"
-                     HorizontalAlignment="Left" VerticalAlignment="Top"
-                     Margin="680,180,0,0"
-                     RenderTransformOrigin="0.5,0.5"
+                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     Margin="0,0,35,55"
                      Opacity="0.12">
-                <Viewbox.RenderTransform>
-                    <ScaleTransform x:Name="Star0Scale" ScaleX="1" ScaleY="1" />
-                </Viewbox.RenderTransform>
                 <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
             </Viewbox>
 
             <Viewbox x:Name="Star1" Width="10" Height="10"
-                     HorizontalAlignment="Left" VerticalAlignment="Top"
-                     Margin="740,240,0,0"
-                     RenderTransformOrigin="0.5,0.5"
+                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     Margin="0,0,105,25"
                      Opacity="0.12">
-                <Viewbox.RenderTransform>
-                    <ScaleTransform x:Name="Star1Scale" ScaleX="1" ScaleY="1" />
-                </Viewbox.RenderTransform>
                 <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
             </Viewbox>
 
             <Viewbox x:Name="Star2" Width="9" Height="9"
-                     HorizontalAlignment="Left" VerticalAlignment="Top"
-                     Margin="750,140,0,0"
-                     RenderTransformOrigin="0.5,0.5"
+                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     Margin="0,0,20,140"
                      Opacity="0.12">
-                <Viewbox.RenderTransform>
-                    <ScaleTransform x:Name="Star2Scale" ScaleX="1" ScaleY="1" />
-                </Viewbox.RenderTransform>
                 <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
             </Viewbox>
 
             <Viewbox x:Name="Star3" Width="11" Height="11"
-                     HorizontalAlignment="Left" VerticalAlignment="Top"
-                     Margin="620,300,0,0"
-                     RenderTransformOrigin="0.5,0.5"
+                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     Margin="0,0,170,80"
                      Opacity="0.12">
-                <Viewbox.RenderTransform>
-                    <ScaleTransform x:Name="Star3Scale" ScaleX="1" ScaleY="1" />
-                </Viewbox.RenderTransform>
                 <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
             </Viewbox>
 
             <Viewbox x:Name="Star4" Width="8" Height="8"
-                     HorizontalAlignment="Left" VerticalAlignment="Top"
-                     Margin="560,220,0,0"
-                     RenderTransformOrigin="0.5,0.5"
+                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     Margin="0,0,240,35"
                      Opacity="0.12">
-                <Viewbox.RenderTransform>
-                    <ScaleTransform x:Name="Star4Scale" ScaleX="1" ScaleY="1" />
-                </Viewbox.RenderTransform>
                 <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
             </Viewbox>
 
             <Viewbox x:Name="Star5" Width="12" Height="12"
-                     HorizontalAlignment="Left" VerticalAlignment="Top"
-                     Margin="800,200,0,0"
-                     RenderTransformOrigin="0.5,0.5"
+                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     Margin="0,0,55,190"
                      Opacity="0.12">
-                <Viewbox.RenderTransform>
-                    <ScaleTransform x:Name="Star5Scale" ScaleX="1" ScaleY="1" />
-                </Viewbox.RenderTransform>
                 <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
             </Viewbox>
 
             <Viewbox x:Name="Star6" Width="7" Height="7"
-                     HorizontalAlignment="Left" VerticalAlignment="Top"
-                     Margin="640,120,0,0"
-                     RenderTransformOrigin="0.5,0.5"
+                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     Margin="0,0,185,195"
                      Opacity="0.12">
-                <Viewbox.RenderTransform>
-                    <ScaleTransform x:Name="Star6Scale" ScaleX="1" ScaleY="1" />
-                </Viewbox.RenderTransform>
                 <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
             </Viewbox>
 
             <Viewbox x:Name="Star7" Width="10" Height="10"
-                     HorizontalAlignment="Left" VerticalAlignment="Top"
-                     Margin="520,160,0,0"
-                     RenderTransformOrigin="0.5,0.5"
+                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     Margin="0,0,255,140"
                      Opacity="0.12">
-                <Viewbox.RenderTransform>
-                    <ScaleTransform x:Name="Star7Scale" ScaleX="1" ScaleY="1" />
-                </Viewbox.RenderTransform>
                 <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
             </Viewbox>
         </Grid>

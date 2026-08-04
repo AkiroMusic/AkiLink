@@ -30,6 +30,13 @@ public partial class MainViewModel : ObservableObject
     private float _savedVolume = 0.75f;
     private bool _savedIsMuted;
 
+    /// <summary>
+    /// The device instance that currently holds an open connection. Tracked separately
+    /// from SelectedDevice so the per-device IsConnected flag can be cleared even if the
+    /// user changes the selection between connect and disconnect (e.g. auto-reconnect).
+    /// </summary>
+    private BluetoothDeviceInfo? _connectedDevice;
+
     public MainViewModel(IBluetoothAudioService btService, IAudioVolumeService volumeService, ISettingsService settingsService, IDialogService? dialogService = null)
     {
         _btService = btService;
@@ -289,6 +296,10 @@ public partial class MainViewModel : ObservableObject
                 ConnectionStateText = T("StatusConnected");
                 StatusMessage = T("StatusConnectedTo", deviceName);
 
+                // Flag the selected device as connected in the device list.
+                _connectedDevice = SelectedDevice;
+                if (_connectedDevice != null) _connectedDevice.IsConnected = true;
+
                 if (AutoReconnect)
                 {
                     await _btService.StartAutoReconnectAsync(SelectedDevice.Id);
@@ -317,6 +328,14 @@ public partial class MainViewModel : ObservableObject
         IsConnected = false;
         ConnectionStateText = T("StatusDisconnected");
         StatusMessage = T("StatusDisconnectedMsg");
+
+        // Clear the per-device connected flag on the device that actually held the
+        // connection, even if the selection changed since it was opened.
+        if (_connectedDevice != null)
+        {
+            _connectedDevice.IsConnected = false;
+            _connectedDevice = null;
+        }
     }
 
     private bool CanDisconnect() => IsConnected;
@@ -488,9 +507,27 @@ public partial class MainViewModel : ObservableObject
                 // Log state changes with the selected device name
                 var deviceName = SelectedDevice?.Name ?? "Unknown";
                 if (state == AudioPlaybackConnectionState.Opened)
+                {
+                    // Track the device that owns the connection and flag it in the
+                    // device list. On auto-reconnect SelectedDevice is still the same
+                    // instance, so this re-flags the same entry.
+                    _connectedDevice = SelectedDevice;
+                    if (_connectedDevice != null) _connectedDevice.IsConnected = true;
                     AddHistoryEntry(deviceName, ConnectionEventType.Connected);
-                else if (state == AudioPlaybackConnectionState.Closed && previousState == AudioPlaybackConnectionState.Opened)
-                    AddHistoryEntry(deviceName, ConnectionEventType.Disconnected);
+                }
+                else if (state == AudioPlaybackConnectionState.Closed)
+                {
+                    // Clear the flag on the tracked device even if no device is
+                    // selected anymore, or if Connect() opened it without a prior
+                    // Opened state event.
+                    if (_connectedDevice != null)
+                    {
+                        _connectedDevice.IsConnected = false;
+                        _connectedDevice = null;
+                    }
+                    if (previousState == AudioPlaybackConnectionState.Opened)
+                        AddHistoryEntry(deviceName, ConnectionEventType.Disconnected);
+                }
             });
         }
         catch { /* Suppress exceptions from async void event handlers */ }

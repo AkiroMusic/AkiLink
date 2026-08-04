@@ -247,6 +247,68 @@ public class MainViewModelTests
         Assert.Contains("StatusDisconnectedMsg", _viewModel.StatusMessage);
     }
 
+    // ─── Per-Device Connection State (RED tests — fail before implementation) ──
+
+    [Fact]
+    public void StateChange_ToOpened_SetsSelectedDeviceIsConnected()
+    {
+        // The SAME instance must back both the collection and the selection so
+        // IsConnected flips on the instance the device list binds to.
+        var device = CreateBluetoothDevice("Dev", "id1");
+        _viewModel.Devices.Add(device);
+        _viewModel.SelectedDevice = device;
+
+        _btMock.Raise(x => x.StateChanged += null, AudioPlaybackConnectionState.Opened);
+
+        Assert.True(device.IsConnected);
+    }
+
+    [Fact]
+    public void StateChange_ToClosed_ClearsDeviceIsConnected()
+    {
+        var device = CreateBluetoothDevice("Dev", "id1");
+        _viewModel.Devices.Add(device);
+        _viewModel.SelectedDevice = device;
+        _btMock.Raise(x => x.StateChanged += null, AudioPlaybackConnectionState.Opened);
+        // Pre-condition: the opened state must have flagged the device first,
+        // otherwise this assertion would pass vacuously.
+        Assert.True(device.IsConnected);
+
+        _btMock.Raise(x => x.StateChanged += null, AudioPlaybackConnectionState.Closed);
+
+        Assert.False(device.IsConnected);
+    }
+
+    [Fact]
+    public async Task Connect_Success_SetsDeviceIsConnected()
+    {
+        var device = CreateBluetoothDevice("Dev", "id1");
+        _viewModel.Devices.Add(device);
+        _viewModel.SelectedDevice = device;
+        _btMock.Setup(x => x.ConnectAsync(device.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        await _viewModel.ConnectCommand.ExecuteAsync(null);
+
+        Assert.True(device.IsConnected);
+    }
+
+    [Fact]
+    public void Disconnect_ClearsDeviceIsConnected()
+    {
+        var device = CreateBluetoothDevice("Dev", "id1");
+        _viewModel.Devices.Add(device);
+        _viewModel.SelectedDevice = device;
+        _btMock.Raise(x => x.StateChanged += null, AudioPlaybackConnectionState.Opened);
+        // Pre-condition: the opened state must have flagged the device first,
+        // otherwise this assertion would pass vacuously.
+        Assert.True(device.IsConnected);
+
+        _viewModel.DisconnectCommand.Execute(null);
+
+        Assert.False(device.IsConnected);
+    }
+
     [Fact]
     public async Task ToggleMute_TogglesIsMuted()
     {
@@ -601,6 +663,8 @@ public class MainViewModelTests
 
         Assert.False(entry.HasDetail);
     }
+
+    // ─── Test Helpers ───────────────────────────────────
 
     /// <summary>
     /// Creates a BluetoothDeviceInfo for testing using the test-friendly constructor.
