@@ -1,11 +1,12 @@
 <UserControl x:Class="AkiLink.Views.SettingsPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:AkiLink.Controls">
     <ScrollViewer Style="{StaticResource PanelScrollViewerStyle}">
         <StackPanel>
 
             <!-- ── Language ── -->
-            <Border Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
+            <controls:CardBorder Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
                 <StackPanel>
                     <TextBlock Text="{DynamicResource SettingsLanguage}"
                                Style="{StaticResource SettingSectionStyle}" />
@@ -21,10 +22,10 @@
                                 CommandParameter="zh-CN" />
                     </StackPanel>
                 </StackPanel>
-            </Border>
+            </controls:CardBorder>
 
             <!-- ── Auto-Reconnect ── -->
-            <Border Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
+            <controls:CardBorder Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -44,10 +45,10 @@
                                   Style="{StaticResource ToggleSwitchStyle}"
                                   VerticalAlignment="Center" />
                 </Grid>
-            </Border>
+            </controls:CardBorder>
 
             <!-- ── Close to Tray ── -->
-            <Border Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
+            <controls:CardBorder Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -67,7 +68,7 @@
                                   Style="{StaticResource ToggleSwitchStyle}"
                                   VerticalAlignment="Center" />
                 </Grid>
-            </Border>
+            </controls:CardBorder>
 
         </StackPanel>
     </ScrollViewer>

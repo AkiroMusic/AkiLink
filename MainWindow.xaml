@@ -5,6 +5,7 @@
         xmlns:views="clr-namespace:AkiLink.Views"
         xmlns:local="clr-namespace:AkiLink"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        xmlns:controls="clr-namespace:AkiLink.Controls"
         Title="AkiLink" Height="650" Width="860"
         MinHeight="500" MinWidth="700"
         WindowStartupLocation="CenterScreen"
@@ -44,7 +45,7 @@
         <Grid>
         <Grid.RowDefinitions>
             <!-- Custom Title Bar -->
-            <RowDefinition Height="32" />
+            <RowDefinition Height="40" />
             <!-- Main content (sidebar + content area) -->
             <RowDefinition Height="*" />
             <!-- Status bar -->
@@ -55,10 +56,10 @@
               CUSTOM TITLE BAR
               ════════════════════════════════════════ -->
         <Border Grid.Row="0"
-                Background="{StaticResource ThemeSurface}"
-                BorderBrush="{StaticResource ThemeBorder}"
+                Background="{StaticResource GlassBackgroundStrong}"
+                BorderBrush="{StaticResource GlassBorder}"
                 BorderThickness="0,0,0,1"
-                Height="32"
+                Height="40"
                 MouseDown="TitleBar_MouseDown">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -77,7 +78,7 @@
                             <RectangleGeometry RadiusX="4" RadiusY="4" Rect="0,0,18,18" />
                         </Image.Clip>
                     </Image>
-                    <TextBlock Text="AkiLink" FontFamily="Segoe UI Variable, Segoe UI"
+                    <TextBlock Text="AkiLink"
                                FontSize="12" Foreground="{StaticResource ThemeText}"
                                VerticalAlignment="Center" />
                 </StackPanel>
@@ -121,16 +122,17 @@
                         <Button Command="{Binding NavigateToViewCommand}"
                                 CommandParameter="Devices"
                                 ToolTip="{DynamicResource NavDevices}"
+                                Background="{Binding CurrentView, Converter={StaticResource ViewToActiveBackgroundConverter}, ConverterParameter=Devices}"
                                 Style="{StaticResource SidebarButtonStyle}">
                             <StackPanel>
-                                <Viewbox Width="22" Height="22">
+                                <Viewbox Width="21" Height="21">
                                     <Canvas Width="24" Height="24">
                                         <Path Data="{x:Static local:IconGeometries.DevicesIcon}"
                                               Fill="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Devices}" />
                                     </Canvas>
                                 </Viewbox>
                                 <TextBlock Text="{DynamicResource NavDevices}"
-                                           FontSize="9"
+                                           FontSize="10"
                                            Foreground="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Devices}"
                                            HorizontalAlignment="Center"
                                            Margin="0,2,0,0" />
@@ -141,16 +143,17 @@
                         <Button Command="{Binding NavigateToViewCommand}"
                                 CommandParameter="Audio"
                                 ToolTip="{DynamicResource NavAudio}"
+                                Background="{Binding CurrentView, Converter={StaticResource ViewToActiveBackgroundConverter}, ConverterParameter=Audio}"
                                 Style="{StaticResource SidebarButtonStyle}">
                             <StackPanel>
-                                <Viewbox Width="22" Height="22">
+                                <Viewbox Width="21" Height="21">
                                     <Canvas Width="24" Height="24">
                                         <Path Data="{x:Static local:IconGeometries.AudioQualityIcon}"
                                               Fill="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Audio}" />
                                     </Canvas>
                                 </Viewbox>
                                 <TextBlock Text="{DynamicResource NavAudio}"
-                                           FontSize="9"
+                                           FontSize="10"
                                            Foreground="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Audio}"
                                            HorizontalAlignment="Center"
                                            Margin="0,2,0,0" />
@@ -161,16 +164,17 @@
                         <Button Command="{Binding NavigateToViewCommand}"
                                 CommandParameter="Settings"
                                 ToolTip="{DynamicResource NavSettings}"
+                                Background="{Binding CurrentView, Converter={StaticResource ViewToActiveBackgroundConverter}, ConverterParameter=Settings}"
                                 Style="{StaticResource SidebarButtonStyle}">
                             <StackPanel>
-                                <Viewbox Width="22" Height="22">
+                                <Viewbox Width="21" Height="21">
                                     <Canvas Width="24" Height="24">
                                         <Path Data="{x:Static local:IconGeometries.SettingsIcon}"
                                               Fill="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Settings}" />
                                     </Canvas>
                                 </Viewbox>
                                 <TextBlock Text="{DynamicResource NavSettings}"
-                                           FontSize="9"
+                                           FontSize="10"
                                            Foreground="{Binding CurrentView, Converter={StaticResource ViewToActiveBrushConverter}, ConverterParameter=Settings}"
                                            HorizontalAlignment="Center"
                                            Margin="0,2,0,0" />
@@ -191,7 +195,7 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- ── LEFT: DEVICE LIST ── -->
-                    <Border Grid.Column="0"
+                    <controls:CardBorder Grid.Column="0"
                             Style="{StaticResource CardBorderStyle}"
                             Padding="0"
                             Margin="20,16,0,12">
@@ -308,9 +312,9 @@
                                            VerticalAlignment="Center"
                                            TextWrapping="Wrap"
                                            Margin="20" />
-                            </Border>
+                             </Border>
                         </Grid>
-                    </Border>
+                    </controls:CardBorder>
 
                     <!-- Column spacer -->
                     <Grid Grid.Column="1" />
@@ -322,7 +326,7 @@
                                   Margin="0,16,20,12">
                         <StackPanel>
                             <!-- ── CONNECTION CARD ── -->
-                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                            <controls:CardBorder Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
                                 <StackPanel>
                                     <TextBlock Text="{DynamicResource ConnectionTitle}"
                                                Style="{StaticResource SubheadingTextStyle}"
@@ -373,10 +377,10 @@
                                             Style="{StaticResource DisconnectButtonStyle}"
                                             Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibilityConverter}}" />
                                 </StackPanel>
-                            </Border>
+                            </controls:CardBorder>
 
                             <!-- ── VOLUME CARD ── -->
-                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                            <controls:CardBorder Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
                                 <StackPanel>
                                     <Grid Margin="0,0,0,12">
                                         <Grid.ColumnDefinitions>
@@ -387,9 +391,8 @@
                                                    Text="{DynamicResource VolumeTitle}"
                                                    Style="{StaticResource SubheadingTextStyle}" />
                                         <TextBlock Grid.Column="1"
-                                                   Style="{StaticResource BodyTextStyle}"
-                                                   VerticalAlignment="Center"
-                                                   FontWeight="SemiBold">
+                                                   Style="{StaticResource MonoValueTextStyle}"
+                                                   VerticalAlignment="Center">
                                             <TextBlock.Text>
                                                 <Binding Path="Volume" StringFormat="{}{0:P0}" />
                                             </TextBlock.Text>
@@ -430,7 +433,7 @@
                                         </TextBlock>
                                     </Button>
                                 </StackPanel>
-                            </Border>
+                            </controls:CardBorder>
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>
@@ -451,7 +454,7 @@
                             </Grid.RowDefinitions>
 
                             <!-- ── CODEC SELECTION CARD ── -->
-                            <Border Style="{StaticResource CardBorderStyle}" Grid.Row="0" Margin="0,0,0,12">
+                            <controls:CardBorder Style="{StaticResource CardBorderStyle}" Grid.Row="0" Margin="0,0,0,12">
                                 <StackPanel>
                                     <TextBlock Text="{DynamicResource SettingsCodec}"
                                                Style="{StaticResource SubheadingTextStyle}"
@@ -542,12 +545,12 @@
                                                 </Style>
                                             </Button.Style>
                                         </Button>
-                                    </WrapPanel>
+                                     </WrapPanel>
                                 </StackPanel>
-                            </Border>
+                            </controls:CardBorder>
 
                             <!-- ── BITRATE CARD ── -->
-                            <Border Style="{StaticResource CardBorderStyle}" Grid.Row="1" Margin="0,0,0,12">
+                            <controls:CardBorder Style="{StaticResource CardBorderStyle}" Grid.Row="1" Margin="0,0,0,12">
                                 <StackPanel>
                                     <TextBlock Text="{DynamicResource SettingsBitrate}"
                                                Style="{StaticResource SubheadingTextStyle}"
@@ -655,12 +658,12 @@
                                                 </Style>
                                             </Button.Style>
                                         </Button>
-                                    </WrapPanel>
+                                     </WrapPanel>
                                 </StackPanel>
-                            </Border>
+                            </controls:CardBorder>
 
                             <!-- ── SAMPLE RATE CARD ── -->
-                            <Border Style="{StaticResource CardBorderStyle}" Grid.Row="2" Margin="0,0,0,12">
+                            <controls:CardBorder Style="{StaticResource CardBorderStyle}" Grid.Row="2" Margin="0,0,0,12">
                                 <StackPanel>
                                     <TextBlock Text="{DynamicResource SettingsSampleRate}"
                                                Style="{StaticResource SubheadingTextStyle}"
@@ -700,12 +703,12 @@
                                                 </Style>
                                             </Button.Style>
                                         </Button>
-                                    </WrapPanel>
+                                     </WrapPanel>
                                 </StackPanel>
-                            </Border>
+                            </controls:CardBorder>
 
                             <!-- ── TRANSMISSION MODE CARD ── -->
-                            <Border Style="{StaticResource CardBorderStyle}" Grid.Row="3" Margin="0,0,0,12">
+                            <controls:CardBorder Style="{StaticResource CardBorderStyle}" Grid.Row="3" Margin="0,0,0,12">
                                 <StackPanel>
                                     <TextBlock Text="{DynamicResource SettingsTransmission}"
                                                Style="{StaticResource SubheadingTextStyle}"
@@ -762,9 +765,9 @@
                                                 </Style>
                                             </Button.Style>
                                         </Button>
-                                    </WrapPanel>
+                                     </WrapPanel>
                                 </StackPanel>
-                            </Border>
+                            </controls:CardBorder>
 
 <!-- ── QUALITY GUIDE CARD ──
                                   Informational hint panel — visually distinct from the
@@ -852,10 +855,11 @@
              STATUS BAR
              ════════════════════════════════════════ -->
         <Border Grid.Row="2"
-                Background="{StaticResource ThemeSurfaceAlt}"
-                BorderBrush="{StaticResource ThemeBorder}"
+                Background="{StaticResource GlassBackgroundStrong}"
+                BorderBrush="{StaticResource GlassBorder}"
                 BorderThickness="0,1,0,0"
-                Padding="20,8">
+                Height="28"
+                Padding="20,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -908,67 +912,41 @@
         </Border>
 
         <!-- ════════════════════════════════════════
-             ANIMATED STAR BACKGROUND
-             (subtle, non-interactive, above content)
+             AMBIENT BACKGROUND GLOW
+             Subtle radial glows painted behind the content
+             (non-interactive), replacing the old star field.
              ════════════════════════════════════════ -->
         <Grid Grid.RowSpan="3"
               IsHitTestVisible="False"
-              Margin="0,32,0,0">
-            <Viewbox x:Name="Star0" Width="14" Height="14"
-                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                     Margin="0,0,35,55"
-                     Opacity="0.12">
-                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
-            </Viewbox>
-
-            <Viewbox x:Name="Star1" Width="10" Height="10"
-                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                     Margin="0,0,105,25"
-                     Opacity="0.12">
-                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
-            </Viewbox>
-
-            <Viewbox x:Name="Star2" Width="9" Height="9"
-                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                     Margin="0,0,20,140"
-                     Opacity="0.12">
-                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
-            </Viewbox>
-
-            <Viewbox x:Name="Star3" Width="11" Height="11"
-                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                     Margin="0,0,170,80"
-                     Opacity="0.12">
-                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
-            </Viewbox>
-
-            <Viewbox x:Name="Star4" Width="8" Height="8"
-                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                     Margin="0,0,240,35"
-                     Opacity="0.12">
-                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
-            </Viewbox>
-
-            <Viewbox x:Name="Star5" Width="12" Height="12"
-                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                     Margin="0,0,55,190"
-                     Opacity="0.12">
-                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
-            </Viewbox>
-
-            <Viewbox x:Name="Star6" Width="7" Height="7"
-                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                     Margin="0,0,185,195"
-                     Opacity="0.12">
-                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
-            </Viewbox>
-
-            <Viewbox x:Name="Star7" Width="10" Height="10"
-                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                     Margin="0,0,255,140"
-                     Opacity="0.12">
-                <Path Data="{x:Static local:IconGeometries.StarIcon}" Fill="{StaticResource ThemeAccentSecondary}" />
-            </Viewbox>
+              Margin="0,40,0,0">
+            <!-- Top-left ambient glow (accent) -->
+            <Rectangle>
+                <Rectangle.Fill>
+                    <RadialGradientBrush>
+                        <RadialGradientBrush.RelativeTransform>
+                            <TransformGroup>
+                                <ScaleTransform CenterX="0" CenterY="0" ScaleX="1.6" ScaleY="1.6" />
+                            </TransformGroup>
+                        </RadialGradientBrush.RelativeTransform>
+                        <GradientStop Offset="0" Color="#1E6C8CFF" />
+                        <GradientStop Offset="1" Color="#00000000" />
+                    </RadialGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <!-- Bottom-right ambient glow (accent-secondary) -->
+            <Rectangle>
+                <Rectangle.Fill>
+                    <RadialGradientBrush>
+                        <RadialGradientBrush.RelativeTransform>
+                            <TransformGroup>
+                                <ScaleTransform CenterX="1" CenterY="1" ScaleX="1.6" ScaleY="1.6" />
+                            </TransformGroup>
+                        </RadialGradientBrush.RelativeTransform>
+                        <GradientStop Offset="0" Color="#14A78BFA" />
+                        <GradientStop Offset="1" Color="#00000000" />
+                    </RadialGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
         </Grid>
         </Grid>
     </Border>

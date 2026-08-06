@@ -21,6 +21,7 @@
             <converters:ViewTypeToVisibilityConverter x:Key="ViewTypeToVisibilityConverter" />
             <converters:PercentToSignalOpacityConverter x:Key="PercentToSignalOpacityConverter" />
             <converters:ViewToActiveBrushConverter x:Key="ViewToActiveBrushConverter" />
+            <converters:ViewToActiveBackgroundConverter x:Key="ViewToActiveBackgroundConverter" />
             <converters:BoolToBrushConverter x:Key="BoolToBrushConverter" />
             <converters:ConnectionEventTypeToTextConverter x:Key="ConnectionEventTypeToTextConverter" />
         </ResourceDictionary>

@@ -5,12 +5,20 @@
     </ResourceDictionary.MergedDictionaries>
 
     <!-- ═══════════════════════════════════════════
+         FONT TOKENS — "Ethereal Glass" typography
+         UI sans: Plus Jakarta Sans | display serif: Fraunces | mono: IBM Plex Mono
+         ═══════════════════════════════════════════ -->
+    <FontFamily x:Key="FontSans">pack://application:,,,/Resources/Fonts/#Plus Jakarta Sans</FontFamily>
+    <FontFamily x:Key="FontSerif">pack://application:,,,/Resources/Fonts/#Fraunces</FontFamily>
+    <FontFamily x:Key="FontMono">pack://application:,,,/Resources/Fonts/#IBM Plex Mono</FontFamily>
+
+    <!-- ═══════════════════════════════════════════
          BASE / GLOBAL STYLES
          ═══════════════════════════════════════════ -->
 
     <!-- Default text style for the application -->
     <Style TargetType="TextElement">
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
         <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
     </Style>
 
@@ -22,8 +30,8 @@
     <Style TargetType="Window" x:Key="ModernWindowStyle">
         <Setter Property="Background" Value="{StaticResource ThemeBackground}" />
         <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
         <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
         <Setter Property="UseLayoutRounding" Value="True" />
@@ -36,63 +44,82 @@
 
     <!-- ═══════════════════════════════════════════
          TEXTBLOCK STYLES
+         Card title (h2): 20px / 600 / Fraunces
+         UI text: 13px | label: 12px | micro: 10px +0.02em | footer: 11px
          ═══════════════════════════════════════════ -->
     <Style TargetType="TextBlock" x:Key="HeadingTextStyle">
-        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontSize" Value="24" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSerif}" />
     </Style>
 
     <Style TargetType="TextBlock" x:Key="SubheadingTextStyle">
-        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontSize" Value="20" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSerif}" />
     </Style>
 
     <Style TargetType="TextBlock" x:Key="BodyTextStyle">
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
     </Style>
 
     <Style TargetType="TextBlock" x:Key="CaptionTextStyle">
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Foreground" Value="{StaticResource ThemeTextSecondary}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
     </Style>
 
     <Style TargetType="TextBlock" x:Key="SmallTextStyle">
         <Setter Property="FontSize" Value="11" />
         <Setter Property="Foreground" Value="{StaticResource ThemeTextSecondary}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
+    </Style>
+
+    <Style TargetType="TextBlock" x:Key="MicroTextStyle">
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="Foreground" Value="{StaticResource ThemeTextTertiary}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
+    </Style>
+
+    <!-- Numeric/parameter values use IBM Plex Mono per spec -->
+    <Style TargetType="TextBlock" x:Key="MonoValueTextStyle">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
+        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
     </Style>
 
     <!-- Default implicit TextBlock style -->
     <Style TargetType="TextBlock">
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
     </Style>
 
     <!-- ═══════════════════════════════════════════
-         CARD BORDER STYLE
+         CARD BORDER STYLES
+         Radius lg=24, padding 24, hairline border, layered blue-tinted shadow.
+         Applied to Border or controls:CardBorder (which adds a recessed
+         5px inner hairline automatically).
          ═══════════════════════════════════════════ -->
     <Style TargetType="Border" x:Key="CardBorderStyle">
         <Setter Property="Background" Value="{StaticResource ThemeCard}" />
-        <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="Padding" Value="16" />
+        <Setter Property="CornerRadius" Value="24" />
+        <Setter Property="Padding" Value="24" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="BorderBrush" Value="{StaticResource ThemeBorder}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect BlurRadius="16"
-                                  ShadowDepth="2"
+                <DropShadowEffect BlurRadius="24"
+                                  ShadowDepth="3"
                                   Direction="270"
-                                  Opacity="0.35"
-                                  Color="#000000" />
+                                  Opacity="0.5"
+                                  Color="#04060C" />
             </Setter.Value>
         </Setter>
     </Style>
@@ -100,23 +127,24 @@
     <!-- Glass card variant with semi-transparent background -->
     <Style TargetType="Border" x:Key="GlassCardStyle">
         <Setter Property="Background" Value="{StaticResource ThemeCardGlass}" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Padding" Value="20" />
+        <Setter Property="CornerRadius" Value="24" />
+        <Setter Property="Padding" Value="24" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{StaticResource ThemeBorder}" />
+        <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}" />
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect BlurRadius="24"
+                <DropShadowEffect BlurRadius="32"
                                   ShadowDepth="4"
                                   Direction="270"
-                                  Opacity="0.4"
-                                  Color="#000000" />
+                                  Opacity="0.5"
+                                  Color="#04060C" />
             </Setter.Value>
         </Setter>
     </Style>
 
     <!-- ═══════════════════════════════════════════
          MODERN BUTTON STYLE
+         Radius sm=10, focus ring 2px accent + 2px offset
          ═══════════════════════════════════════════ -->
     <Style TargetType="Button" x:Key="ModernButtonStyle">
         <Setter Property="Background" Value="{StaticResource ThemePrimary}" />
@@ -125,8 +153,8 @@
         <Setter Property="Padding" Value="24,0" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -137,14 +165,14 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="6"
+                            CornerRadius="10"
                             SnapsToDevicePixels="True">
                         <Border.Effect>
-                            <DropShadowEffect BlurRadius="8"
+                            <DropShadowEffect BlurRadius="12"
                                               ShadowDepth="1"
                                               Direction="270"
-                                              Opacity="0.25"
-                                              Color="#000" />
+                                              Opacity="0.35"
+                                              Color="#04060C" />
                         </Border.Effect>
                         <Grid>
                             <ContentPresenter x:Name="ContentPresenter"
@@ -176,7 +204,7 @@
                             <Setter TargetName="RootBorder" Property="Opacity" Value="0.4" />
                             <Setter Property="Foreground" Value="{StaticResource ThemeTextSecondary}" />
                         </Trigger>
-                        <!-- Focus state -->
+                        <!-- Focus state: 2px accent ring -->
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter TargetName="RootBorder" Property="BorderBrush"
                                     Value="{StaticResource ThemeAccent}" />
@@ -201,8 +229,8 @@
         <Setter Property="Padding" Value="24,0" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -213,13 +241,13 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="6">
+                            CornerRadius="10">
                         <Border.Effect>
-                            <DropShadowEffect BlurRadius="8"
+                            <DropShadowEffect BlurRadius="12"
                                               ShadowDepth="1"
                                               Direction="270"
-                                              Opacity="0.25"
-                                              Color="#000" />
+                                              Opacity="0.35"
+                                              Color="#04060C" />
                         </Border.Effect>
                         <Grid>
                             <ContentPresenter HorizontalAlignment="Center"
@@ -243,6 +271,11 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="RootBorder" Property="Opacity" Value="0.35" />
                         </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="RootBorder" Property="BorderBrush"
+                                    Value="{StaticResource ThemeAccent}" />
+                            <Setter TargetName="RootBorder" Property="BorderThickness" Value="2" />
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -260,8 +293,8 @@
         <Setter Property="BorderThickness" Value="1.5" />
         <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -272,7 +305,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="6">
+                            CornerRadius="10">
                         <Grid>
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"
@@ -297,6 +330,11 @@
                                     Value="{StaticResource ThemeTextSecondary}" />
                             <Setter TargetName="RootBorder" Property="Opacity" Value="0.4" />
                         </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="RootBorder" Property="BorderBrush"
+                                    Value="{StaticResource ThemeAccent}" />
+                            <Setter TargetName="RootBorder" Property="BorderThickness" Value="2" />
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -313,8 +351,8 @@
         <Setter Property="Padding" Value="32,0" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
-        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -325,13 +363,13 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="8">
+                            CornerRadius="14">
                         <Border.Effect>
-                            <DropShadowEffect BlurRadius="12"
+                            <DropShadowEffect BlurRadius="16"
                                               ShadowDepth="2"
                                               Direction="270"
-                                              Opacity="0.35"
-                                              Color="#000" />
+                                              Opacity="0.4"
+                                              Color="#04060C" />
                         </Border.Effect>
                         <Grid>
                             <ContentPresenter HorizontalAlignment="Center"
@@ -354,6 +392,11 @@
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="RootBorder" Property="Opacity" Value="0.35" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="RootBorder" Property="BorderBrush"
+                                    Value="{StaticResource ThemeAccent}" />
+                            <Setter TargetName="RootBorder" Property="BorderThickness" Value="2" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -368,8 +411,8 @@
         <Setter Property="Padding" Value="32,0" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
-        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -380,13 +423,13 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="8">
+                            CornerRadius="14">
                         <Border.Effect>
-                            <DropShadowEffect BlurRadius="12"
+                            <DropShadowEffect BlurRadius="16"
                                               ShadowDepth="2"
                                               Direction="270"
-                                              Opacity="0.35"
-                                              Color="#000" />
+                                              Opacity="0.4"
+                                              Color="#04060C" />
                         </Border.Effect>
                         <Grid>
                             <ContentPresenter HorizontalAlignment="Center"
@@ -409,6 +452,11 @@
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="RootBorder" Property="Opacity" Value="0.35" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="RootBorder" Property="BorderBrush"
+                                    Value="{StaticResource ThemeError}" />
+                            <Setter TargetName="RootBorder" Property="BorderThickness" Value="2" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -430,10 +478,10 @@
                   StrokeThickness="2"
                   SnapsToDevicePixels="True">
             <Ellipse.Effect>
-                <DropShadowEffect BlurRadius="6"
+                <DropShadowEffect BlurRadius="8"
                                   ShadowDepth="1"
                                   Opacity="0.3"
-                                  Color="#000" />
+                                  Color="#04060C" />
             </Ellipse.Effect>
         </Ellipse>
         <ControlTemplate.Triggers>
@@ -567,10 +615,10 @@
                                 BorderThickness="0"
                                 SnapsToDevicePixels="True">
                             <Border.Effect>
-                                <DropShadowEffect BlurRadius="4"
+                                <DropShadowEffect BlurRadius="6"
                                                   ShadowDepth="1"
-                                                  Opacity="0.2"
-                                                  Color="#000" />
+                                                  Opacity="0.25"
+                                                  Color="#04060C" />
                             </Border.Effect>
                         </Border>
 
@@ -586,10 +634,10 @@
                                  Margin="3,0,0,0"
                                  SnapsToDevicePixels="True">
                             <Ellipse.Effect>
-                                <DropShadowEffect BlurRadius="4"
+                                <DropShadowEffect BlurRadius="6"
                                                   ShadowDepth="1"
                                                   Opacity="0.3"
-                                                  Color="#000" />
+                                                  Color="#04060C" />
                             </Ellipse.Effect>
                         </Ellipse>
                     </Grid>
@@ -619,15 +667,15 @@
 
     <!-- ═══════════════════════════════════════════
          LISTBOX STYLE
-         Transparent background, card-style items
+         Transparent background, card-style items (radius md=16)
          ═══════════════════════════════════════════ -->
     <!-- ListBox base style -->
     <Style TargetType="ListBox" x:Key="ModernListBoxStyle">
         <Setter Property="Background" Value="{StaticResource BrushTransparent}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -669,16 +717,16 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="8"
+                            CornerRadius="16"
                             SnapsToDevicePixels="True"
                             Padding="{TemplateBinding Padding}"
                             Margin="{TemplateBinding Margin}">
                         <Border.Effect>
-                            <DropShadowEffect BlurRadius="8"
+                            <DropShadowEffect BlurRadius="12"
                                               ShadowDepth="1"
                                               Direction="270"
-                                              Opacity="0.2"
-                                              Color="#000" />
+                                              Opacity="0.25"
+                                              Color="#04060C" />
                         </Border.Effect>
                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalAlignment="Center"
@@ -689,15 +737,15 @@
                         <!-- Hover -->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="RootBorder" Property="Background"
-                                    Value="{StaticResource ThemeHover}" />
+                                    Value="{StaticResource ThemeSurface2}" />
                         </Trigger>
                         <!-- Selected -->
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="RootBorder" Property="Background"
-                                    Value="{StaticResource ThemePrimaryGlass}" />
+                                    Value="{StaticResource ThemePrimaryTint}" />
                             <Setter TargetName="RootBorder" Property="BorderBrush"
                                     Value="{StaticResource ThemePrimary}" />
-                            <Setter Property="Foreground" Value="{StaticResource BrushWhite}" />
+                            <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
                         </Trigger>
                         <!-- Focus -->
                         <MultiTrigger>
@@ -706,7 +754,7 @@
                                 <Condition Property="Selector.IsSelectionActive" Value="True" />
                             </MultiTrigger.Conditions>
                             <Setter TargetName="RootBorder" Property="Background"
-                                    Value="{StaticResource ThemePrimaryGlass}" />
+                                    Value="{StaticResource ThemePrimaryTint}" />
                             <Setter TargetName="RootBorder" Property="BorderBrush"
                                     Value="{StaticResource ThemePrimary}" />
                         </MultiTrigger>
@@ -747,7 +795,7 @@
                     <Border x:Name="RootBorder"
                             Background="{TemplateBinding Background}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="2"
+                            CornerRadius="1.5"
                             Margin="1,2"
                             SnapsToDevicePixels="True" />
                     <ControlTemplate.Triggers>
@@ -865,7 +913,7 @@
     <Style TargetType="ToolTip" x:Key="ModernToolTipStyle">
         <Setter Property="Background" Value="{StaticResource ThemeSurface}" />
         <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="BorderBrush" Value="{StaticResource ThemeBorder}" />
@@ -878,13 +926,13 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="6"
+                            CornerRadius="10"
                             Padding="{TemplateBinding Padding}">
                         <Border.Effect>
-                            <DropShadowEffect BlurRadius="12"
+                            <DropShadowEffect BlurRadius="16"
                                               ShadowDepth="2"
                                               Opacity="0.4"
-                                              Color="#000" />
+                                              Color="#04060C" />
                         </Border.Effect>
                         <ContentPresenter HorizontalAlignment="Center"
                                           VerticalAlignment="Center" />
@@ -932,7 +980,7 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect BlurRadius="8"
+                <DropShadowEffect BlurRadius="10"
                                   ShadowDepth="0"
                                   Opacity="0.8"
                                   Color="{StaticResource ConnectedGreen}" />
@@ -956,7 +1004,7 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect BlurRadius="8"
+                <DropShadowEffect BlurRadius="10"
                                   ShadowDepth="0"
                                   Opacity="0.8"
                                   Color="{StaticResource ConnectingOrange}" />
@@ -968,13 +1016,13 @@
          STATUS BAR / CONTAINER STYLES
          ═══════════════════════════════════════════ -->
 
-    <!-- Status bar at the bottom of the window -->
+    <!-- Status bar at the bottom of the window — glass 28px footer -->
     <Style TargetType="Border" x:Key="StatusBarStyle">
-        <Setter Property="Background" Value="{StaticResource ThemeSurface}" />
-        <Setter Property="Height" Value="32" />
+        <Setter Property="Background" Value="{StaticResource GlassBackgroundStrong}" />
+        <Setter Property="Height" Value="28" />
         <Setter Property="Padding" Value="16,0" />
-        <Setter Property="BorderThickness" Value="1,0,0,0" />
-        <Setter Property="BorderBrush" Value="{StaticResource ThemeBorder}" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
+        <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}" />
         <Setter Property="VerticalAlignment" Value="Bottom" />
     </Style>
 
@@ -983,8 +1031,8 @@
          ═══════════════════════════════════════════ -->
     <Style TargetType="Label" x:Key="ModernLabelStyle">
         <Setter Property="Foreground" Value="{StaticResource ThemeTextSecondary}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
+        <Setter Property="FontSize" Value="12" />
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="Padding" Value="0,0,0,4" />
         <Setter Property="HorizontalAlignment" Value="Left" />
@@ -1001,8 +1049,8 @@
         <Setter Property="BorderBrush" Value="{StaticResource ThemeBorder}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Padding" Value="16" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Template">
@@ -1017,20 +1065,20 @@
                                 Background="{StaticResource ThemeSurfaceAlt}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="1,1,1,0"
-                                CornerRadius="8,8,0,0"
+                                CornerRadius="16,16,0,0"
                                 Padding="12,6">
                             <ContentPresenter ContentSource="Header"
                                               HorizontalAlignment="Left"
                                               VerticalAlignment="Center"
                                               RecognizesAccessKey="True"
                                               TextBlock.FontWeight="SemiBold"
-                                              TextBlock.FontSize="13" />
+                                              TextBlock.FontSize="12" />
                         </Border>
                         <Border Grid.Row="1"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="1,0,1,1"
-                                CornerRadius="0,0,8,8"
+                                CornerRadius="0,0,16,16"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Left"
                                               VerticalAlignment="Top"
@@ -1046,23 +1094,26 @@
     <Style TargetType="GroupBox" BasedOn="{StaticResource ModernGroupBoxStyle}" />
 
     <!-- ═══════════════════════════════════════════
-         SIDEBAR NAVIGATION STYLES
+         SIDEBAR NAVIGATION — Material 3 rail
+         80px wide · 52px buttons · radius 14 · icon 21px · label 10px
+         Active state: accent pill (ThemePrimaryTint) driven by
+         ViewToActiveBackgroundConverter on the button Background.
          ═══════════════════════════════════════════ -->
 
-    <!-- Sidebar container -->
+    <!-- Sidebar container — frosted glass panel -->
     <Style TargetType="Border" x:Key="SidebarStyle">
-        <Setter Property="Width" Value="68" />
-        <Setter Property="MinWidth" Value="68" />
-        <Setter Property="Background" Value="{StaticResource ThemeSurface}" />
-        <Setter Property="BorderBrush" Value="{StaticResource ThemeBorder}" />
+        <Setter Property="Width" Value="80" />
+        <Setter Property="MinWidth" Value="80" />
+        <Setter Property="Background" Value="{StaticResource GlassBackground}" />
+        <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}" />
         <Setter Property="BorderThickness" Value="0,0,1,0" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 
     <!-- Sidebar nav button - supports both icons and icon+text content -->
     <Style TargetType="Button" x:Key="SidebarButtonStyle">
-        <Setter Property="Width" Value="68" />
-        <Setter Property="Height" Value="54" />
+        <Setter Property="Width" Value="80" />
+        <Setter Property="Height" Value="52" />
         <Setter Property="Background" Value="{StaticResource BrushTransparent}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Cursor" Value="Hand" />
@@ -1070,28 +1121,28 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
-                        <!-- Active indicator bar -->
-                        <Border x:Name="ActiveBar"
-                                Width="2"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Stretch"
-                                Margin="0,4,0,4"
-                                CornerRadius="0,2,2,0"
-                                Background="{StaticResource ThemePrimary}"
-                                Opacity="0" />
+                    <Border x:Name="PillBorder"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="14"
+                            Margin="8,0"
+                            SnapsToDevicePixels="True">
                         <ContentPresenter HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
                                           RecognizesAccessKey="True" />
-                    </Grid>
+                    </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="RootGrid" Property="Background"
-                                    Value="{StaticResource ThemeSurface2}" />
+                            <Setter TargetName="PillBorder" Property="Background"
+                                    Value="{StaticResource ThemePrimaryTintHover}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="RootGrid" Property="Background"
-                                    Value="{StaticResource ThemeBorder}" />
+                            <Setter TargetName="PillBorder" Property="Background"
+                                    Value="{StaticResource ThemePrimaryTint}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="PillBorder" Property="BorderBrush"
+                                    Value="{StaticResource ThemePrimary}" />
+                            <Setter TargetName="PillBorder" Property="BorderThickness" Value="2" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -1102,12 +1153,8 @@
     <!-- Sidebar nav button - active state applied via tag or attached property -->
     <Style TargetType="Button" x:Key="SidebarButtonActiveStyle"
            BasedOn="{StaticResource SidebarButtonStyle}">
+        <Setter Property="Background" Value="{StaticResource ThemePrimaryTint}" />
         <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <!-- ═══════════════════════════════════════════
@@ -1116,14 +1163,14 @@
          ═══════════════════════════════════════════ -->
 
     <Style TargetType="Button" x:Key="OptionChipStyle">
-        <Setter Property="Padding" Value="10,5" />
-        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="MinHeight" Value="30" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="BorderBrush" Value="{StaticResource ThemeBorder}" />
         <Setter Property="Background" Value="{StaticResource BrushTransparent}" />
         <Setter Property="Foreground" Value="{StaticResource ThemeTextSecondary}" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Template">
@@ -1133,7 +1180,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="8"
+                            CornerRadius="10"
                             Padding="{TemplateBinding Padding}"
                             SnapsToDevicePixels="True">
                         <ContentPresenter HorizontalAlignment="Center"
@@ -1161,7 +1208,7 @@
     <Style TargetType="Button" x:Key="OptionChipActiveStyle"
            BasedOn="{StaticResource OptionChipStyle}">
         <Setter Property="BorderBrush" Value="{StaticResource ThemePrimary}" />
-        <Setter Property="Background" Value="{StaticResource ThemePrimaryGlass}" />
+        <Setter Property="Background" Value="{StaticResource ThemePrimaryTint}" />
         <Setter Property="Foreground" Value="{StaticResource ThemePrimary}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
@@ -1172,9 +1219,9 @@
 
     <!-- Settings section heading -->
     <Style TargetType="TextBlock" x:Key="SettingSectionStyle">
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="12" />
         <Setter Property="Foreground" Value="{StaticResource ThemeTextSecondary}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
         <Setter Property="Margin" Value="0,0,0,8" />
     </Style>
 
@@ -1182,18 +1229,18 @@
     <Style TargetType="TextBlock" x:Key="SettingHintStyle">
         <Setter Property="FontSize" Value="11" />
         <Setter Property="Foreground" Value="{StaticResource ThemeTextTertiary}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="LineHeight" Value="16" />
         <Setter Property="Margin" Value="0,6,0,0" />
     </Style>
 
-    <!-- Settings value label (for slider values etc.) -->
+    <!-- Settings value label (for slider values etc.) — mono numerals per spec -->
     <Style TargetType="TextBlock" x:Key="SettingValueStyle">
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="16" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
         <Setter Property="Margin" Value="0,0,0,8" />
     </Style>
 
@@ -1205,9 +1252,9 @@
         <Setter Property="Background" Value="{StaticResource ThemeCard}" />
         <Setter Property="BorderBrush" Value="{StaticResource ThemeBorder}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="Padding" Value="12,10" />
-        <Setter Property="Margin" Value="0,0,0,6" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Padding" Value="14,12" />
+        <Setter Property="Margin" Value="0,0,0,8" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 
@@ -1253,14 +1300,15 @@
 
     <!-- ═══════════════════════════════════════════
          SECTION CARD (for settings/options grouping)
+         Radius lg=24 · padding 24
          ═══════════════════════════════════════════ -->
 
     <Style TargetType="Border" x:Key="SectionCardStyle">
         <Setter Property="Background" Value="{StaticResource ThemeCard}" />
         <Setter Property="BorderBrush" Value="{StaticResource ThemeBorder}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="Padding" Value="16" />
+        <Setter Property="CornerRadius" Value="24" />
+        <Setter Property="Padding" Value="24" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 
@@ -1313,11 +1361,11 @@
     <!-- Base style for window caption buttons (minimize/maximize) -->
     <Style TargetType="Button" x:Key="WindowControlButtonStyle">
         <Setter Property="Width" Value="46" />
-        <Setter Property="Height" Value="32" />
+        <Setter Property="Height" Value="40" />
         <Setter Property="Background" Value="{StaticResource BrushTransparent}" />
         <Setter Property="Foreground" Value="{StaticResource ThemeText}" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}" />
         <Setter Property="FontSize" Value="10" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Template">

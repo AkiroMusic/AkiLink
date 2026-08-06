@@ -8,7 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Resources\AkiLink.ico</ApplicationIcon>
-    <Version>1.1.6</Version>
+    <Version>1.1.7</Version>
     <NoWarn>$(NoWarn);CS0105</NoWarn>
   </PropertyGroup>
 
@@ -27,6 +27,7 @@
   <ItemGroup>
     <Resource Include="Resources\AkiLink.ico" />
     <Resource Include="Resources\AkiLink.png" />
+    <Resource Include="Resources\Fonts\*.ttf" />
   </ItemGroup>
 
 </Project>
