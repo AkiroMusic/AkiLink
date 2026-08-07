@@ -29,6 +29,8 @@
     <sys:String x:Key="StatusConnecting">连接中...</sys:String>
     <sys:String x:Key="AutoReconnect">自动重连</sys:String>
     <sys:String x:Key="AutoReconnectDesc">自动重连上次连接的设备</sys:String>
+    <sys:String x:Key="AutoConnectOnStartup">启动时自动连接</sys:String>
+    <sys:String x:Key="AutoConnectOnStartupDesc">AkiLink 启动时自动连接上次使用的设备</sys:String>
     <sys:String x:Key="CloseToTray">关闭到托盘</sys:String>
     <sys:String x:Key="CloseToTrayDesc">关闭窗口时最小化到托盘而非退出程序，音频持续播放</sys:String>
 
@@ -36,6 +38,7 @@
     <sys:String x:Key="VolumeTitle">音量</sys:String>
     <sys:String x:Key="Mute">静音</sys:String>
     <sys:String x:Key="Unmute">取消静音</sys:String>
+    <sys:String x:Key="LevelTitle">电平</sys:String>
 
     <!-- ════════════ Settings Panel ════════════ -->
     <sys:String x:Key="SettingsTitle">设置</sys:String>
@@ -85,6 +88,10 @@
     <sys:String x:Key="StatusDisconnectedMsg">已断开设备连接</sys:String>
     <sys:String x:Key="StatusErrorMsg">错误：{0}</sys:String>
     <sys:String x:Key="StatusReady">就绪</sys:String>
+
+    <!-- ════════════ Notifications ════════════ -->
+    <sys:String x:Key="NotificationConnected">已连接到 {0}</sys:String>
+    <sys:String x:Key="NotificationDisconnected">已与 {0} 断开连接</sys:String>
 
     <!-- ════════════ Confirmations ════════════ -->
     <sys:String x:Key="ConfirmClearHistory">确定要清空所有连接历史吗？</sys:String>

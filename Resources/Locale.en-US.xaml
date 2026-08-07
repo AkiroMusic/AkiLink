@@ -29,6 +29,8 @@
     <sys:String x:Key="StatusConnecting">Connecting...</sys:String>
     <sys:String x:Key="AutoReconnect">Auto-Reconnect</sys:String>
     <sys:String x:Key="AutoReconnectDesc">Automatically reconnect to last device</sys:String>
+    <sys:String x:Key="AutoConnectOnStartup">Auto-Connect on Startup</sys:String>
+    <sys:String x:Key="AutoConnectOnStartupDesc">When AkiLink starts, automatically connect to the last device</sys:String>
     <sys:String x:Key="CloseToTray">Close to Tray</sys:String>
     <sys:String x:Key="CloseToTrayDesc">When closing the window, minimize to tray instead of quitting</sys:String>
 
@@ -36,6 +38,7 @@
     <sys:String x:Key="VolumeTitle">Volume</sys:String>
     <sys:String x:Key="Mute">Mute</sys:String>
     <sys:String x:Key="Unmute">Unmute</sys:String>
+    <sys:String x:Key="LevelTitle">Level</sys:String>
 
     <!-- ════════════ Settings Panel ════════════ -->
     <sys:String x:Key="SettingsTitle">Settings</sys:String>
@@ -85,6 +88,10 @@
     <sys:String x:Key="StatusDisconnectedMsg">Disconnected from device</sys:String>
     <sys:String x:Key="StatusErrorMsg">Error: {0}</sys:String>
     <sys:String x:Key="StatusReady">Ready</sys:String>
+
+    <!-- ════════════ Notifications ════════════ -->
+    <sys:String x:Key="NotificationConnected">Connected to {0}</sys:String>
+    <sys:String x:Key="NotificationDisconnected">Disconnected from {0}</sys:String>
 
     <!-- ════════════ Confirmations ════════════ -->
     <sys:String x:Key="ConfirmClearHistory">Clear all connection history?</sys:String>

@@ -13,6 +13,7 @@ public class MainViewModelTests
     private readonly Mock<IAudioVolumeService> _volumeMock;
     private readonly Mock<IDialogService> _dialogMock;
     private readonly Mock<ISettingsService> _settingsMock;
+    private readonly Mock<INotificationService> _notificationMock;
     private readonly MainViewModel _viewModel;
 
     public MainViewModelTests()
@@ -21,6 +22,7 @@ public class MainViewModelTests
         _volumeMock = new Mock<IAudioVolumeService>();
         _dialogMock = new Mock<IDialogService>();
         _settingsMock = new Mock<ISettingsService>();
+        _notificationMock = new Mock<INotificationService>();
 
         // Setup default mocks
         _volumeMock.Setup(x => x.Volume).Returns(0.75f);
@@ -28,6 +30,7 @@ public class MainViewModelTests
         _settingsMock.Setup(x => x.Load()).Returns(new AppSettings());
 
         _viewModel = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object);
+        _viewModel.AttachNotificationService(_notificationMock.Object);
     }
 
     [Fact]
@@ -662,6 +665,207 @@ public class MainViewModelTests
         var entry = new ConnectionHistoryEntry(DateTime.Now, "Device-A", ConnectionEventType.Connected, "   ");
 
         Assert.False(entry.HasDetail);
+    }
+
+    // ─── Auto-Connect on Startup (#6) ──────────────
+
+    [Fact]
+    public async Task Connect_Success_PersistsLastDeviceId()
+    {
+        var device = CreateBluetoothDevice("Test Device", "test-id-1");
+        _viewModel.Devices.Add(device);
+        _viewModel.SelectedDevice = device;
+
+        _btMock.Setup(x => x.ConnectAsync(device.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        await _viewModel.ConnectCommand.ExecuteAsync(null);
+
+        _settingsMock.Verify(x => x.Save(It.Is<AppSettings>(s => s.LastDeviceId == device.Id)), Times.AtLeastOnce);
+    }
+
+    [Fact]
+    public void Constructor_LoadsAutoConnectOnStartup_FromSettings()
+    {
+        var saved = new AppSettings { AutoConnectOnStartup = true, LastDeviceId = "saved-id" };
+        _settingsMock.Setup(x => x.Load()).Returns(saved);
+
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object);
+
+        Assert.True(vm.AutoConnectOnStartup);
+    }
+
+    [Fact]
+    public async Task TryAutoConnect_WhenDisabled_DoesNotScan()
+    {
+        // AutoConnectOnStartup defaults to false
+        await _viewModel.TryAutoConnectAsync();
+
+        _btMock.Verify(x => x.ScanDevicesAsync(), Times.Never);
+        _btMock.Verify(x => x.ConnectAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task TryAutoConnect_WhenEnabled_AndDeviceFound_Connects()
+    {
+        var saved = new AppSettings { AutoConnectOnStartup = true, LastDeviceId = "saved-id" };
+        _settingsMock.Setup(x => x.Load()).Returns(saved);
+
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object);
+        var device = CreateBluetoothDevice("Saved Device", "saved-id");
+        vm.Devices.Add(device);
+
+        _btMock.Setup(x => x.ScanDevicesAsync())
+            .ReturnsAsync(Array.Empty<DeviceInformation>().AsReadOnly());
+        _btMock.Setup(x => x.ConnectAsync("saved-id", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        await vm.TryAutoConnectAsync();
+
+        _btMock.Verify(x => x.ScanDevicesAsync(), Times.Once);
+        _btMock.Verify(x => x.ConnectAsync("saved-id", It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Same(device, vm.SelectedDevice);
+    }
+
+    [Fact]
+    public async Task TryAutoConnect_WhenEnabled_AndNoDeviceFound_DoesNotConnect()
+    {
+        var saved = new AppSettings { AutoConnectOnStartup = true, LastDeviceId = "saved-id" };
+        _settingsMock.Setup(x => x.Load()).Returns(saved);
+
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object);
+
+        _btMock.Setup(x => x.ScanDevicesAsync())
+            .ReturnsAsync(Array.Empty<DeviceInformation>().AsReadOnly());
+
+        await vm.TryAutoConnectAsync();
+
+        _btMock.Verify(x => x.ConnectAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        Assert.Null(vm.SelectedDevice);
+    }
+
+    [Fact]
+    public async Task TryAutoConnect_WhenEnabled_ButAlreadyConnected_DoesNotScan()
+    {
+        var saved = new AppSettings { AutoConnectOnStartup = true, LastDeviceId = "saved-id" };
+        _settingsMock.Setup(x => x.Load()).Returns(saved);
+
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object);
+        _btMock.Raise(x => x.StateChanged += null, AudioPlaybackConnectionState.Opened);
+
+        await vm.TryAutoConnectAsync();
+
+        _btMock.Verify(x => x.ScanDevicesAsync(), Times.Never);
+    }
+
+    // ─── Background Notifications (#8) ──────────────
+
+    [Fact]
+    public void StateChange_ToOpened_ShowsConnectedNotification()
+    {
+        var device = CreateBluetoothDevice("Phone", "id1");
+        _viewModel.Devices.Add(device);
+        _viewModel.SelectedDevice = device;
+
+        _btMock.Raise(x => x.StateChanged += null, AudioPlaybackConnectionState.Opened);
+
+        _notificationMock.Verify(x => x.ShowNotification(
+            It.IsAny<string>(),
+            It.Is<string>(m => m.Contains("NotificationConnected"))), Times.Once);
+    }
+
+    [Fact]
+    public void StateChange_ToClosed_AfterOpened_ShowsDisconnectedNotification()
+    {
+        var device = CreateBluetoothDevice("Phone", "id1");
+        _viewModel.Devices.Add(device);
+        _viewModel.SelectedDevice = device;
+
+        _btMock.Raise(x => x.StateChanged += null, AudioPlaybackConnectionState.Opened);
+        _notificationMock.Invocations.Clear();
+
+        // Unexpected drop: state flips Closed from Opened without a Disconnect() call.
+        _btMock.Raise(x => x.StateChanged += null, AudioPlaybackConnectionState.Closed);
+
+        _notificationMock.Verify(x => x.ShowNotification(
+            It.IsAny<string>(),
+            It.Is<string>(m => m.Contains("NotificationDisconnected"))), Times.Once);
+    }
+
+    [Fact]
+    public void Disconnect_DoesNotShowDisconnectedNotification()
+    {
+        var device = CreateBluetoothDevice("Phone", "id1");
+        _viewModel.Devices.Add(device);
+        _viewModel.SelectedDevice = device;
+        _btMock.Raise(x => x.StateChanged += null, AudioPlaybackConnectionState.Opened);
+        _notificationMock.Invocations.Clear();
+
+        // User-initiated disconnect: Disconnect() marks the teardown so the Closed
+        // event that follows is NOT surfaced as an unexpected-drop toast.
+        _viewModel.DisconnectCommand.Execute(null);
+        _btMock.Raise(x => x.StateChanged += null, AudioPlaybackConnectionState.Closed);
+
+        _notificationMock.Verify(x => x.ShowNotification(
+            It.IsAny<string>(),
+            It.Is<string>(m => m.Contains("NotificationDisconnected"))), Times.Never);
+    }
+
+    // ─── Level Meter (#2) ─────────────────────────
+
+    [Fact]
+    public void LevelChanged_FromService_UpdatesAudioLevelPercent()
+    {
+        var levelMeterMock = new Mock<IAudioLevelMeterService>();
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object, levelMeterMock.Object);
+
+        levelMeterMock.Raise(x => x.LevelChanged += null, 0.5f);
+
+        Assert.Equal(50, vm.AudioLevelPercent);
+    }
+
+    [Fact]
+    public void LevelChanged_WithValueAboveOne_ClampsToHundred()
+    {
+        var levelMeterMock = new Mock<IAudioLevelMeterService>();
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object, levelMeterMock.Object);
+
+        levelMeterMock.Raise(x => x.LevelChanged += null, 1.5f);
+
+        Assert.Equal(100, vm.AudioLevelPercent);
+    }
+
+    [Fact]
+    public void LevelChanged_WithNegativeValue_ClampsToZero()
+    {
+        var levelMeterMock = new Mock<IAudioLevelMeterService>();
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object, levelMeterMock.Object);
+
+        levelMeterMock.Raise(x => x.LevelChanged += null, -0.2f);
+
+        Assert.Equal(0, vm.AudioLevelPercent);
+    }
+
+    // ─── AudioLevelMeterService.NextLevel Smoothing ─────────────────────
+
+    [Fact]
+    public void NextLevel_WhenRawIsHigher_AttacksInstantly()
+    {
+        Assert.Equal(0.8f, AudioLevelMeterService.NextLevel(0.2f, 0.8f));
+    }
+
+    [Fact]
+    public void NextLevel_WhenRawIsLower_ReleasesExponentially()
+    {
+        // 0.8 * 0.82 = 0.656, which stays above the raw sample of 0.1
+        Assert.Equal(0.8f * 0.82f, AudioLevelMeterService.NextLevel(0.8f, 0.1f));
+    }
+
+    [Fact]
+    public void NextLevel_NeverDecaysBelowRaw()
+    {
+        // 0.1 * 0.82 = 0.082 > 0.05, so the release keeps the bar above the raw sample
+        Assert.Equal(0.1f * 0.82f, AudioLevelMeterService.NextLevel(0.1f, 0.05f));
     }
 
     // ─── Test Helpers ───────────────────────────────────

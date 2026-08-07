@@ -434,6 +434,44 @@
                                     </Button>
                                 </StackPanel>
                             </controls:CardBorder>
+
+                            <!-- ── LEVEL CARD (live VU meter) ── -->
+                            <controls:CardBorder Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{DynamicResource LevelTitle}"
+                                                   Style="{StaticResource SubheadingTextStyle}" />
+                                        <TextBlock Grid.Column="1"
+                                                   Style="{StaticResource MonoValueTextStyle}"
+                                                   VerticalAlignment="Center">
+                                            <TextBlock.Text>
+                                                <Binding Path="AudioLevelPercent" StringFormat="{}{0}%" />
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </Grid>
+
+                                    <!-- Level bar: fill column is proportional to AudioLevelPercent;
+                                         the remainder column absorbs the leftover space so the
+                                         track stays full-width at every level. -->
+                                    <Border Height="10"
+                                            Background="{StaticResource ThemeSurface2}"
+                                            CornerRadius="5"
+                                            ClipToBounds="True">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="{Binding AudioLevelPercent, Converter={StaticResource PercentToGridLengthConverter}}" />
+                                                <ColumnDefinition Width="{Binding AudioLevelPercent, Converter={StaticResource PercentToGridLengthConverter}, ConverterParameter=Remainder}" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Background="{StaticResource ThemeAccent}" />
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </controls:CardBorder>
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>

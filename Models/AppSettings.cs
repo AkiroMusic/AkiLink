@@ -19,6 +19,8 @@ public class AppSettings
 
     // ── Behaviour ──
     public bool AutoReconnect { get; set; }
+    public bool AutoConnectOnStartup { get; set; }
+    public string? LastDeviceId { get; set; }
     public bool CloseToTray { get; set; }
 
     // ── UI ──

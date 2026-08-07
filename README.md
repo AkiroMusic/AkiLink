@@ -16,6 +16,9 @@
   - Bitrate selection (up to 990 kbps)
   - Sample rate selection (44100 / 48000 Hz)
   - Transmission mode (Balanced / Best Quality / Low Latency)
+- **Live VU Meter** — Real-time playback level via CoreAudio `IAudioMeterInformation`, rendered as a proportional bar that proves audio is actually flowing
+- **Auto-Connect on Startup** — Automatically reconnect to the last-used device when the app launches
+- **Background Notifications** — Tray balloon alerts on connect and unexpected disconnect (suppressed for user-initiated disconnects)
 - **Auto-Reconnect** — Automatically reconnects when the paired device comes back in range
 - **Connection History** — Full log of connect/disconnect/error events with delete and clear support
 - **Compact Mode** — Minimal overlay UI for always-on-top monitoring
@@ -37,6 +40,7 @@ AkiLink/
 │   ├── ConnectionEventTypeToTextConverter.cs
 │   ├── ConnectionStateToColorConverter.cs
 │   ├── InverseBoolConverter.cs
+│   ├── PercentToGridLengthConverter.cs  # VU meter bar sizing
 │   ├── PercentToSignalOpacityConverter.cs
 │   ├── ViewToActiveBrushConverter.cs
 │   └── ViewTypeEqualityConverter.cs
@@ -52,13 +56,16 @@ AkiLink/
 │   ├── Locale.en-US.xaml
 │   └── Locale.zh-CN.xaml
 ├── Services/            # Core business logic
+│   ├── AudioLevelMeterService.cs    # CoreAudio IAudioMeterInformation wrapper
 │   ├── AudioVolumeService.cs        # Windows CoreAudio COM wrapper
 │   ├── BluetoothAudioService.cs     # WinRT AudioPlaybackConnection
+│   ├── IAudioLevelMeterService.cs   # Level meter service interface
 │   ├── IAudioVolumeService.cs       # Volume service interface
 │   ├── IBluetoothAudioService.cs    # Bluetooth service interface
 │   ├── IDialogService.cs            # Dialog abstraction for testing
+│   ├── INotificationService.cs      # Desktop notification abstraction
 │   ├── LocalizationService.cs       # Runtime language switching
-│   └── SystemTrayService.cs         # System tray icon + context menu
+│   ├── SystemTrayService.cs         # System tray icon + notifications
 ├── Styles/              # XAML resources and control templates
 │   ├── Brushes.xaml      # Color palette (dark + light)
 │   ├── Controls.xaml     # All control styles
@@ -72,8 +79,9 @@ AkiLink/
 │   └── SettingsPanel.xaml.cs
 ├── tests/               # Unit tests (xUnit + Moq)
 │   └── AkiLink.Tests/
-│       ├── MainViewModelTests.cs   # 48 tests
-│       └── SettingsServiceTests.cs # 6 tests
+│       ├── MainViewModelTests.cs   # 67 tests
+│       ├── SettingsServiceTests.cs # 6 tests
+│       └── IconGeometriesTests.cs  # 7 tests
 ├── App.xaml             # Application entry + resources
 ├── App.xaml.cs          # Startup / shutdown orchestration
 ├── IconGeometries.cs    # SVG path data for sidebar icons
@@ -108,7 +116,7 @@ The app uses `net10.0-windows10.0.19041.0` to access WinRT APIs (`Windows.Device
 
 ## Testing
 
-65 unit tests covering:
+80 unit tests covering:
 
 - Constructor initialization and service subscription
 - Device scanning states (success, failure, empty results)
@@ -121,6 +129,9 @@ The app uses `net10.0-windows10.0.19041.0` to access WinRT APIs (`Windows.Device
 - Connection history (clear with confirmation, delete entry, HasHistory tracking, detail-row HasDetail)
 - Codec settings propagation
 - `CanExecute` logic for connect/disconnect buttons
+- Live VU meter level clamping (0-100) and exponential-release smoothing (`NextLevel`)
+- Auto-connect on startup (guard flags, device matching, LastDeviceId persistence)
+- Background notifications on connect/disconnect (and suppression for user-initiated disconnects)
 
 Run with:
 
@@ -130,6 +141,7 @@ dotnet test ./tests/AkiLink.Tests
 
 ## Version History
 
+- **v1.1.8** — Three new features: a **live VU level meter** (`AudioLevelMeterService` wraps CoreAudio `IAudioMeterInformation`, polling the default render endpoint at ~33Hz with a 30ms `DispatcherTimer`, an instant-attack / exponential-release smoothing curve via the pure `NextLevel` function, and a new LEVEL card on the Devices view whose proportional bar is driven by the `PercentToGridLengthConverter`); **auto-connect on startup** (a new `AutoConnectOnStartup` toggle in Settings persists `LastDeviceId` after every successful connect, and `TryAutoConnectAsync` — fired after the main window shows — scans, merges into the `Devices` collection, matches on the saved device ID, and connects; best-effort and silently tolerant of failure); and **background notifications** (a new `INotificationService` abstraction implemented by `SystemTrayService.ShowBalloonTip`, raising a tray balloon on connect and on unexpected disconnect, while a `_userInitiatedDisconnect` flag suppresses the disconnect toast when the user disconnects deliberately). 15 new unit tests (80 total).
 - **v1.1.7** — "Ethereal Glass" redesign: the UI now follows the Aki Design System — Plus Jakarta Sans for UI text, Fraunces (serif) for card titles, IBM Plex Mono for numeric values (9 static TTFs embedded via pack URIs, name tables repaired so the family loads reliably); a new dark palette (`#0E1016` background, `#171A23` / `#212531` surfaces, `#6C8CFF` accent, `#A78BFA` secondary); cards are 24px-radius with 24px padding, a hairline border plus a recessed 5px inner hairline drawn by the new `CardBorder` control (double-frame look); the sidebar became a Material 3 navigation rail (80px wide, 52px buttons, radius 14, 21px icons, 10px labels) with an accent-tinted active pill; a 40px frosted-glass title bar and a 28px glass status bar; two ambient radial glow gradients (accent top-left, accent-secondary bottom-right) replace the old static star field; and the volume percentage now renders in IBM Plex Mono per the numeric-value rule.
 - **v1.1.6** — New app icon with a transparent background: the icon is now a 1254×1254 ARGB PNG and the `.ico` was rebuilt as a proper multi-size set (16/24/32/48/64/128/256) instead of the previous single 16×16 frame, so the exe, taskbar, and system-tray icons render crisply at every DPI. The title-bar icon now also benefits from the alpha channel.
 - **v1.1.5** — Single-instance guard + UI polish: a named Mutex held for the process lifetime enforces one running instance — launching a second instance restores + foregrounds the existing window and exits, eliminating duplicate processes, duplicate tray icons, and conflicting `AudioPlaybackConnection`s on the same adapter; the header bar (app title + connection status) was removed for a more compact layout; the decorative star background lost its animation (the entire `<Window.Triggers>` storyboard and per-star scale transforms were deleted) and the 8 stars now sit static in the bottom-right at 0.12 opacity; the device list shows a per-device "connected" status row (green dot + label + realtime codec), tracked via a dedicated `_connectedDevice` field so the flag clears correctly even when the selection changes between connect and disconnect (4 new tests); the Quality Guide card was redesigned as a flat informational panel with a left accent rail and a TIP badge (new `QualityGuideBadge` key, EN + ZH); scrollbars were slimmed (6px → 3px, thumb 24px → 12px) and the settings list no longer stretches its content horizontally.
@@ -179,6 +191,9 @@ MIT
   - 采样率选择（44100 / 48000 Hz）
   - 传输模式（均衡 / 最佳音质 / 低延迟）
 - **自动重连** — 设备回到范围内时自动重新连接
+- **实时电平表** — 通过 CoreAudio `IAudioMeterInformation` 实时显示播放电平，比例条直观证明音频正在流动
+- **启动自动连接** — 应用启动时自动连接上次使用的设备
+- **后台通知** — 连接/意外断开时托盘气泡提示（用户主动断开时不提示）
 - **连接历史** — 完整的连接/断开/错误事件日志，支持逐条删除和清空
 - **精简模式** — 简约浮窗 UI，始终置顶监控
 - **界面本地化** — 英文和中文 UI 语言，运行时一键切换
@@ -223,6 +238,7 @@ dotnet test
 
 ## 版本历史
 
+- **v1.1.8** — 三个新功能：**实时 VU 电平表**（`AudioLevelMeterService` 封装 CoreAudio `IAudioMeterInformation`，30ms `DispatcherTimer` 约 33Hz 轮询默认渲染端点，纯函数 `NextLevel` 实现瞬时起峰/指数衰减平滑，Devices 视图新增 LEVEL 卡片，比例条由 `PercentToGridLengthConverter` 驱动）；**启动自动连接**（设置中新增 `AutoConnectOnStartup` 开关，每次成功连接后持久化 `LastDeviceId`，主窗口显示后触发 `TryAutoConnectAsync` —— 扫描并合并进 `Devices` 集合、按保存的设备 ID 匹配后自动连接，尽力而为、失败静默容忍）；**后台通知**（新增 `INotificationService` 抽象，由 `SystemTrayService.ShowBalloonTip` 实现，连接与意外断开时弹出托盘气泡，`_userInitiatedDisconnect` 标志在用户主动断开时抑制断开提示）。新增 15 个单元测试（共 80 个）。
 - **v1.1.7** — "Ethereal Glass" 重新设计：界面全面落地 Aki Design System —— 界面文本用 Plus Jakarta Sans、卡片标题用 Fraunces（衬线）、数值用 IBM Plex Mono（9 个静态 TTF 通过 pack URI 内嵌，name 表已修复保证字体族可靠加载）；全新暗色配色（`#0E1016` 背景、`#171A23`/`#212531` 表面、`#6C8CFF` 主色、`#A78BFA` 次色）；卡片为 24px 圆角 + 24px 内边距，发丝边框外加新增 `CardBorder` 控件绘制的 5px 内凹发丝线（双框效果）；侧边栏升级为 Material 3 导航栏（80px 宽、52px 按钮、圆角 14、图标 21px、标签 10px），激活项带主色淡彩药丸；新增 40px 磨砂玻璃标题栏与 28px 玻璃状态栏；两个环境光晕渐变（左上主色、右下次色）取代旧的静态星星背景；音量百分比按数值规则改用 IBM Plex Mono 渲染。
 - **v1.1.6** — 全新应用图标，透明背景：图标源改为 1254×1254 ARGB PNG，`.ico` 重新生成为规范的多尺寸集合（16/24/32/48/64/128/256），取代原来只有 16×16 单帧的旧图标，使 exe、任务栏、系统托盘图标在任何 DPI 下都清晰锐利；标题栏图标也受益于 alpha 通道。
 - **v1.1.5** — 单实例守卫 + UI 打磨：通过进程生命周期持有的命名 Mutex 强制单实例运行 —— 再次启动时会恢复并置前已有窗口后退出，杜绝重复进程、重复托盘图标以及同一适配器上冲突的 `AudioPlaybackConnection`；移除头部栏（应用标题 + 连接状态），布局更紧凑；装饰性星星背景去掉动画（整段 `<Window.Triggers>` 故事板与每颗星的缩放变换已删除），8 颗星改为固定在右下角、0.12 透明度静态显示；设备列表新增每设备"已连接"状态行（绿点 + 标签 + 实时编码），通过独立的 `_connectedDevice` 字段追踪，即使连接与断开之间切换了选中设备也能正确清除标志（新增 4 个测试）；音质指南卡片重设计为扁平信息面板（左侧强调色竖条 + TIP 徽章，新增 `QualityGuideBadge` 键，中英双语）；滚动条瘦身（6px → 3px，滑块 24px → 12px），设置列表内容不再水平拉伸。

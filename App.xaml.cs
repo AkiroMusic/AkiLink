@@ -108,7 +108,17 @@ public partial class App : Application
                 _serviceProvider.GetService<ILogger<SystemTrayService>>());
             _trayService.Initialize();
 
+            // Surface background connection events (connected / unexpected drop)
+            // as tray balloon notifications. Attached here, not via DI, because
+            // the tray service needs the Window which needs this ViewModel.
+            _viewModel.AttachNotificationService(_trayService);
+
             mainWindow.Show();
+
+            // Auto-connect to the last device on startup (if enabled).
+            // Fire-and-forget: TryAutoConnectAsync is best-effort and swallows
+            // its own exceptions, so a stale/offline device can't break startup.
+            _ = _viewModel.TryAutoConnectAsync();
         }
         catch (Exception ex)
         {
@@ -142,6 +152,7 @@ public partial class App : Application
         services.AddSingleton<IBluetoothPlatform, WinRtBluetoothPlatform>();
         services.AddSingleton<IBluetoothAudioService, BluetoothAudioService>();
         services.AddSingleton<IAudioVolumeService, AudioVolumeService>();
+        services.AddSingleton<IAudioLevelMeterService, AudioLevelMeterService>();
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<IDialogService, MessageBoxDialogService>();
         services.AddTransient<MainViewModel>();

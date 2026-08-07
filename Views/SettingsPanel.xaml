@@ -47,6 +47,29 @@
                 </Grid>
             </controls:CardBorder>
 
+            <!-- ── Auto-Connect on Startup ── -->
+            <controls:CardBorder Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="{DynamicResource AutoConnectOnStartup}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource ThemeText}" />
+                        <TextBlock Text="{DynamicResource AutoConnectOnStartupDesc}"
+                                   Style="{StaticResource SettingHintStyle}"
+                                   Margin="0,2,0,0" />
+                    </StackPanel>
+                    <ToggleButton Grid.Column="1"
+                                  IsChecked="{Binding AutoConnectOnStartup}"
+                                  Style="{StaticResource ToggleSwitchStyle}"
+                                  VerticalAlignment="Center" />
+                </Grid>
+            </controls:CardBorder>
+
             <!-- ── Close to Tray ── -->
             <controls:CardBorder Style="{StaticResource SectionCardStyle}" Margin="0,0,0,12">
                 <Grid>

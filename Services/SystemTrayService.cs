@@ -5,7 +5,7 @@ using System.Windows.Controls;
 
 namespace AkiLink.Services;
 
-public class SystemTrayService : IDisposable
+public class SystemTrayService : INotificationService, IDisposable
 {
     private readonly ILogger<SystemTrayService>? _logger;
     private TaskbarIcon? _taskbarIcon;
@@ -117,6 +117,24 @@ public class SystemTrayService : IDisposable
             "AkiLink",
             "Application minimized to tray. Audio connection continues.",
             BalloonIcon.Info);
+    }
+
+    /// <summary>
+    /// Shows an informational balloon notification via the tray icon.
+    /// Best-effort: silently no-ops if the icon is unavailable or disposed,
+    /// so callers (e.g. background connection events) never observe a throw.
+    /// </summary>
+    public void ShowNotification(string title, string message)
+    {
+        try
+        {
+            _taskbarIcon?.ShowBalloonTip(title, message, BalloonIcon.Info);
+        }
+        catch
+        {
+            // Notifications are non-critical; never let a toast failure
+            // propagate into the connection state handling path.
+        }
     }
 
     public void Dispose()
