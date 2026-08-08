@@ -24,13 +24,23 @@ public partial class MainViewModel : ObservableObject
     private readonly IAudioVolumeService _volumeService;
     private readonly ISettingsService _settingsService;
     private readonly IDialogService? _dialogService;
-    private readonly IAudioLevelMeterService? _levelMeterService;
     private INotificationService? _notificationService;
     private bool _isUpdatingVolume;
     private bool _isUpdatingMuted;
     private bool _isLoadingSettings;
     private float _savedVolume = 0.75f;
     private bool _savedIsMuted;
+
+    /// <summary>
+    /// True while a Connect is awaiting the Bluetooth service. Guards against
+    /// double-clicks launching two concurrent connects (which would open two
+    /// overlapping AudioPlaybackConnection objects for the same device) and
+    /// disables the Connect button for the whole duration of the connect.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DisconnectCommand))]
+    private bool _isConnecting;
 
     /// <summary>
     /// Set when the user explicitly disconnects (DisconnectCommand) so the
@@ -67,14 +77,12 @@ public partial class MainViewModel : ObservableObject
         IBluetoothAudioService btService,
         IAudioVolumeService volumeService,
         ISettingsService settingsService,
-        IDialogService? dialogService = null,
-        IAudioLevelMeterService? levelMeterService = null)
+        IDialogService? dialogService = null)
     {
         _btService = btService;
         _volumeService = volumeService;
         _settingsService = settingsService;
         _dialogService = dialogService;
-        _levelMeterService = levelMeterService;
 
         // Suppress SaveSettings() while initializing and loading persisted settings.
         // Without this guard, property-change handlers fire during construction and
@@ -105,13 +113,6 @@ public partial class MainViewModel : ObservableObject
         _volumeService.VolumeChanged += OnVolumeServiceVolumeChanged;
         _volumeService.MuteChanged += OnVolumeServiceMuteChanged;
 
-        // Live VU meter: the level service raises LevelChanged on the UI thread
-        // (DispatcherTimer), so the percent property can be updated directly.
-        if (_levelMeterService != null)
-        {
-            _levelMeterService.LevelChanged += OnLevelMeterLevelChanged;
-        }
-
         // Load persisted settings (used as defaults for Volume/IsMuted)
         LoadSettings();
 
@@ -130,7 +131,6 @@ public partial class MainViewModel : ObservableObject
                     _volumeService.Initialize();
                     Volume = _savedVolume;
                     IsMuted = _savedIsMuted;
-                    _levelMeterService?.Start();
                     _isLoadingSettings = false;
                 }));
         }
@@ -140,7 +140,6 @@ public partial class MainViewModel : ObservableObject
             _volumeService.Initialize();
             Volume = _savedVolume;
             IsMuted = _savedIsMuted;
-            _levelMeterService?.Start();
             _isLoadingSettings = false;
         }
     }
@@ -175,13 +174,6 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isMuted;
-
-    /// <summary>
-    /// Current audio level as an integer percentage (0–100), updated live by the
-    /// level meter service. Backs the VU meter bar in the Devices view.
-    /// </summary>
-    [ObservableProperty]
-    private int _audioLevelPercent;
 
     [ObservableProperty]
     private bool _autoReconnect;
@@ -332,14 +324,19 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanConnect))]
     private async Task Connect()
     {
-        if (SelectedDevice == null) return;
+        // Capture the target device up front: SelectedDevice can change while
+        // we await, and the connected-flag / LastDeviceId bookkeeping below
+        // must reference the device we actually connected to.
+        var target = SelectedDevice;
+        if (target == null) return;
 
-        var deviceName = SelectedDevice.Name;
+        IsConnecting = true;
+        var deviceName = target.Name;
         try
         {
             StatusMessage = T("StatusConnectingTo", deviceName);
 
-            var success = await _btService.ConnectAsync(SelectedDevice.Id);
+            var success = await _btService.ConnectAsync(target.Id);
 
             if (success)
             {
@@ -348,17 +345,17 @@ public partial class MainViewModel : ObservableObject
                 StatusMessage = T("StatusConnectedTo", deviceName);
 
                 // Flag the selected device as connected in the device list.
-                _connectedDevice = SelectedDevice;
+                _connectedDevice = target;
                 if (_connectedDevice != null) _connectedDevice.IsConnected = true;
 
                 // Remember the last-connected device id so AutoConnectOnStartup
                 // can re-establish this session on the next launch.
-                _lastDeviceId = SelectedDevice.Id;
+                _lastDeviceId = target.Id;
                 if (!_isLoadingSettings) SaveSettings();
 
                 if (AutoReconnect)
                 {
-                    await _btService.StartAutoReconnectAsync(SelectedDevice.Id);
+                    await _btService.StartAutoReconnectAsync(target.Id);
                 }
             }
         }
@@ -368,10 +365,14 @@ public partial class MainViewModel : ObservableObject
             AddHistoryEntry(deviceName, ConnectionEventType.Error, ex.Message);
             System.Diagnostics.Debug.WriteLine($"[AkiLink] Connect threw: {ex}");
         }
+        finally
+        {
+            IsConnecting = false;
+        }
     }
 
     private bool CanConnect() =>
-        SelectedDevice != null && !IsConnected && !IsScanning;
+        SelectedDevice != null && !IsConnected && !IsScanning && !IsConnecting;
 
     [RelayCommand(CanExecute = nameof(CanDisconnect))]
     private void Disconnect()
@@ -556,7 +557,18 @@ public partial class MainViewModel : ObservableObject
     {
         var template = System.Windows.Application.Current?.TryFindResource(key) as string;
         if (template == null) return key;
-        return args.Length > 0 ? string.Format(template, args) : template;
+        if (args.Length == 0) return template;
+        try
+        {
+            return string.Format(template, args);
+        }
+        catch (FormatException)
+        {
+            // External strings (Bluetooth/WinRT error messages) can contain
+            // stray '{' that break string.Format — fall back to the raw
+            // template rather than losing the status update entirely.
+            return template;
+        }
     }
 
     // ─── Safe Dispatcher Helper ─────────────────────────
@@ -712,22 +724,6 @@ public partial class MainViewModel : ObservableObject
                 // Persist external mute changes (media keys, other apps) so the
                 // state survives restart.
                 if (!_isLoadingSettings) SaveSettings();
-            });
-        }
-        catch { /* Suppress exceptions from async void event handlers */ }
-    }
-
-    // ─── Level Meter Event Handler ──────────────────────
-
-    private async void OnLevelMeterLevelChanged(float level)
-    {
-        try
-        {
-            await DispatchAsync(() =>
-            {
-                // Clamp to 0–1 defensively (COM GetPeakValue is documented as 0–1
-                // but never trust native code), then scale to an integer percent.
-                AudioLevelPercent = (int)Math.Round(Math.Clamp(level, 0f, 1f) * 100f);
             });
         }
         catch { /* Suppress exceptions from async void event handlers */ }

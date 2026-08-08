@@ -811,63 +811,6 @@ public class MainViewModelTests
             It.Is<string>(m => m.Contains("NotificationDisconnected"))), Times.Never);
     }
 
-    // ─── Level Meter (#2) ─────────────────────────
-
-    [Fact]
-    public void LevelChanged_FromService_UpdatesAudioLevelPercent()
-    {
-        var levelMeterMock = new Mock<IAudioLevelMeterService>();
-        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object, levelMeterMock.Object);
-
-        levelMeterMock.Raise(x => x.LevelChanged += null, 0.5f);
-
-        Assert.Equal(50, vm.AudioLevelPercent);
-    }
-
-    [Fact]
-    public void LevelChanged_WithValueAboveOne_ClampsToHundred()
-    {
-        var levelMeterMock = new Mock<IAudioLevelMeterService>();
-        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object, levelMeterMock.Object);
-
-        levelMeterMock.Raise(x => x.LevelChanged += null, 1.5f);
-
-        Assert.Equal(100, vm.AudioLevelPercent);
-    }
-
-    [Fact]
-    public void LevelChanged_WithNegativeValue_ClampsToZero()
-    {
-        var levelMeterMock = new Mock<IAudioLevelMeterService>();
-        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object, levelMeterMock.Object);
-
-        levelMeterMock.Raise(x => x.LevelChanged += null, -0.2f);
-
-        Assert.Equal(0, vm.AudioLevelPercent);
-    }
-
-    // ─── AudioLevelMeterService.NextLevel Smoothing ─────────────────────
-
-    [Fact]
-    public void NextLevel_WhenRawIsHigher_AttacksInstantly()
-    {
-        Assert.Equal(0.8f, AudioLevelMeterService.NextLevel(0.2f, 0.8f));
-    }
-
-    [Fact]
-    public void NextLevel_WhenRawIsLower_ReleasesExponentially()
-    {
-        // 0.8 * 0.82 = 0.656, which stays above the raw sample of 0.1
-        Assert.Equal(0.8f * 0.82f, AudioLevelMeterService.NextLevel(0.8f, 0.1f));
-    }
-
-    [Fact]
-    public void NextLevel_NeverDecaysBelowRaw()
-    {
-        // 0.1 * 0.82 = 0.082 > 0.05, so the release keeps the bar above the raw sample
-        Assert.Equal(0.1f * 0.82f, AudioLevelMeterService.NextLevel(0.1f, 0.05f));
-    }
-
     // ─── Test Helpers ───────────────────────────────────
 
     /// <summary>

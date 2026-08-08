@@ -82,6 +82,12 @@ public sealed class SettingsService : ISettingsService, IDisposable
 
     public void Save(AppSettings settings)
     {
+        // Once disposed (app exit), drop saves instead of throwing on the
+        // disposed locks — a late volume notification can otherwise fire an
+        // ObjectDisposedException out of an async-void handler during shutdown.
+        if (_disposed)
+            return;
+
         // Cache is updated synchronously so Load() sees the freshest value even
         // before the background flush reaches the disk.
         _cacheLock.EnterWriteLock();
@@ -119,6 +125,11 @@ public sealed class SettingsService : ISettingsService, IDisposable
     {
         while (true)
         {
+            // If Dispose() already ran (app exiting), stop flushing to avoid
+            // touching the disposed _writeGate from a background thread.
+            if (_disposed)
+                return;
+
             AppSettings? snapshot;
             lock (_pendingLock)
             {
@@ -190,7 +201,16 @@ public sealed class SettingsService : ISettingsService, IDisposable
         }
         if (pending is not null)
         {
-            _writeGate.Wait();
+            // Bounded wait: if the flush task is still mid-write after the 5s
+            // drain above, do not block app shutdown indefinitely on a stuck
+            // disk. Best-effort — a lost final write is preferable to a hang.
+            if (!_writeGate.Wait(TimeSpan.FromSeconds(2)))
+            {
+                _pendingWrite = pending; // hand it back so a later flush retries
+                _writeGate.Dispose();
+                _cacheLock.Dispose();
+                return;
+            }
             try { WriteToDisk(pending); } catch { /* best-effort */ }
             finally { _writeGate.Release(); }
         }

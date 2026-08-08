@@ -49,9 +49,39 @@ namespace AkiLink.Services;
     private interface IMMDeviceEnumerator
     {
         [PreserveSig]
-        int EnumAudioEndpoints(int dataFlow, int stateMask, out IMMDevice devices);
+        int EnumAudioEndpoints(int dataFlow, int stateMask, out IMMDevice devices);                       // slot 3
         [PreserveSig]
-        int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice device);
+        int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice device);                        // slot 4
+        [PreserveSig]
+        int RegisterEndpointNotificationCallback(IMMNotificationClient client);                           // slot 5
+        [PreserveSig]
+        int UnregisterEndpointNotificationCallback(IMMNotificationClient client);                         // slot 6
+    }
+
+    /// <summary>
+    /// IMMNotificationClient — receives device-change callbacks from the MMDevice
+    /// enumerator. We only act on OnDefaultDeviceChanged (render flow): when the
+    /// user switches the default playback device (plugs in headphones, changes the
+    /// output in Settings), the volume slider/mute must re-bind to the new endpoint.
+    /// All other methods are required for vtable completeness and are no-ops.
+    /// </summary>
+    [Guid("7991EEC9-7E89-4D85-8390-6C703CEC60C0")]
+    [ComImport]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IMMNotificationClient
+    {
+        [PreserveSig]
+        int OnDeviceStateChanged([MarshalAs(UnmanagedType.LPWStr)] string deviceId, int newState);          // slot 3
+        [PreserveSig]
+        int OnDeviceAdded([MarshalAs(UnmanagedType.LPWStr)] string deviceId);                              // slot 4
+        [PreserveSig]
+        int OnDeviceRemoved([MarshalAs(UnmanagedType.LPWStr)] string deviceId);                            // slot 5
+        [PreserveSig]
+        int OnDefaultDeviceChanged(int dataFlow, int deviceRole, [MarshalAs(UnmanagedType.LPWStr)] string defaultDeviceId); // slot 6
+        [PreserveSig]
+        int OnPropertyValueChanged([MarshalAs(UnmanagedType.LPWStr)] string deviceId, IntPtr propertyKey); // slot 7
+        [PreserveSig]
+        int OnQueryRemove([MarshalAs(UnmanagedType.LPWStr)] string deviceId);                              // slot 8
     }
 
     [Guid("D666063F-1587-4E43-81F1-B948E807363F")]
@@ -125,6 +155,13 @@ namespace AkiLink.Services;
         public float afChannelVolumes;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct PROPERTYKEY
+    {
+        public Guid fmtid;
+        public uint pid;
+    }
+
     // ────────────────────────────── Callback Implementation ──────────────────────────────
 
     [ComVisible(true)]
@@ -163,6 +200,60 @@ namespace AkiLink.Services;
         }
     }
 
+    [ComVisible(true)]
+    [ClassInterface(ClassInterfaceType.None)]
+    private sealed class DeviceNotificationClientImpl : IMMNotificationClient
+    {
+        private AudioVolumeService? _owner;
+
+        public DeviceNotificationClientImpl(AudioVolumeService owner)
+        {
+            _owner = owner;
+        }
+
+        public void ReleaseHandler()
+        {
+            _owner = null;
+        }
+
+        // All methods MUST be declared in native vtable order (slots 3+);
+        // only OnDefaultDeviceChanged is acted upon, the rest are required
+        // for a complete vtable and are no-ops.
+
+        public int OnDeviceStateChanged(string deviceId, int newState) => S_OK;
+
+        public int OnDeviceAdded(string deviceId) => S_OK;
+
+        public int OnDeviceRemoved(string deviceId) => S_OK;
+
+        public int OnDefaultDeviceChanged(int dataFlow, int deviceRole, string defaultDeviceId)
+        {
+            // Only the render (playback) flow matters to us — capture changes
+            // (microphones etc.) must not trigger a re-bind of the volume endpoint.
+            if (dataFlow != E_RENDER)
+                return S_OK;
+
+            var owner = _owner;
+            if (owner == null)
+                return S_OK;
+
+            try
+            {
+                owner.HandleDefaultDeviceChanged();
+            }
+            catch
+            {
+                // Never let exceptions cross the COM boundary
+            }
+
+            return S_OK;
+        }
+
+        public int OnPropertyValueChanged(string deviceId, IntPtr propertyKey) => S_OK;
+
+        public int OnQueryRemove(string deviceId) => S_OK;
+    }
+
     // ────────────────────────────── State ──────────────────────────────
 
     private readonly ILogger<AudioVolumeService>? _logger;
@@ -171,8 +262,15 @@ namespace AkiLink.Services;
     private IMMDevice? _device;
     private IAudioEndpointVolume? _endpointVolume;
     private AudioEndpointVolumeCallbackImpl? _callback;
+    private DeviceNotificationClientImpl? _deviceNotificationClient;
     private bool _disposed;
     private bool _initialized;
+
+    // Cached last-published values so VolumeChanged/MuteChanged only fire when
+    // the underlying value actually changes (avoid duplicate event storms from
+    // repeated CoreAudio notifications with the same value).
+    private float _lastPublishedVolume = float.NaN;
+    private bool? _lastPublishedMuted;
 
     public AudioVolumeService(ILogger<AudioVolumeService>? logger = null)
     {
@@ -238,6 +336,18 @@ namespace AkiLink.Services;
             if (hr < 0)
             {
                 _logger?.LogWarning($"[AkiLink] AudioVolumeService: RegisterControlChangeNotify failed (hr=0x{hr:X8})");
+            }
+
+            // 5. Subscribe to device-change notifications so we can re-bind when
+            //    the user switches the default playback device (headphones plugged
+            //    in, output changed in Settings) without restarting the app.
+            _deviceNotificationClient = new DeviceNotificationClientImpl(this);
+            hr = _deviceEnumerator.RegisterEndpointNotificationCallback(_deviceNotificationClient);
+            if (hr < 0)
+            {
+                _logger?.LogWarning($"[AkiLink] AudioVolumeService: RegisterEndpointNotificationCallback failed (hr=0x{hr:X8})");
+                _deviceNotificationClient.ReleaseHandler();
+                _deviceNotificationClient = null;
             }
 
             _initialized = true;
@@ -340,8 +450,118 @@ namespace AkiLink.Services;
             }
         }
 
-        VolumeChanged?.Invoke(volume);
-        MuteChanged?.Invoke(muted);
+        // #9: only raise an event when the value actually changed. CoreAudio can
+        // deliver repeated notifications with the same volume/mute value (e.g.
+        // Windows echoing state during a device switch); firing on every one of
+        // them would cause a redundant binding-update storm in the UI.
+        var volumeChanged = float.IsNaN(_lastPublishedVolume) || Math.Abs(volume - _lastPublishedVolume) > 0.0001f;
+        if (volumeChanged)
+        {
+            _lastPublishedVolume = volume;
+            VolumeChanged?.Invoke(volume);
+        }
+
+        var mutedChanged = _lastPublishedMuted is null || muted != _lastPublishedMuted;
+        if (mutedChanged)
+        {
+            _lastPublishedMuted = muted;
+            MuteChanged?.Invoke(muted);
+        }
+    }
+
+    // ────────────────────────────── Default Device Change ──────────────────────────────
+
+    private bool _handlingDeviceChange;
+
+    /// <summary>
+    /// Re-binds the volume endpoint when the OS default playback device changes
+    /// (headphones plugged in, output switched in Windows Settings). Called from
+    /// the COM notification thread; marshalled onto the UI thread because the
+    /// COM objects were activated on the main STA thread and event consumers
+    /// expect UI-thread notifications.
+    /// </summary>
+    private void HandleDefaultDeviceChanged()
+    {
+        if (!_initialized || _deviceEnumerator == null)
+            return;
+
+        if (_handlingDeviceChange)
+            return; // re-entrancy guard: a burst of device-change events
+        _handlingDeviceChange = true;
+        try
+        {
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher != null && !dispatcher.CheckAccess())
+            {
+                try
+                {
+                    dispatcher.BeginInvoke(HandleDefaultDeviceChanged);
+                    return;
+                }
+                catch
+                {
+                    // App shutting down — fall through to run inline
+                }
+            }
+
+            _logger?.LogInformation("[AkiLink] AudioVolumeService: default audio device changed, re-binding endpoint.");
+
+            // Unregister the control-change notify on the OLD endpoint first so
+            // we stop receiving stale notifications while swapping.
+            if (_endpointVolume != null && _callback != null)
+            {
+                try { _endpointVolume.UnregisterControlChangeNotify(_callback); } catch { }
+            }
+            _callback?.ReleaseHandler();
+
+            // Release the old endpoint + device
+            if (_endpointVolume != null)
+            {
+                try { Marshal.ReleaseComObject(_endpointVolume); } catch { }
+                _endpointVolume = null;
+            }
+            if (_device != null)
+            {
+                try { Marshal.ReleaseComObject(_device); } catch { }
+                _device = null;
+            }
+
+            // Re-acquire the default render endpoint and re-activate
+            var hr = _deviceEnumerator.GetDefaultAudioEndpoint(E_RENDER, E_CONSOLE, out _device);
+            if (hr < 0 || _device == null)
+            {
+                _logger?.LogWarning($"[AkiLink] AudioVolumeService: re-bind GetDefaultAudioEndpoint failed (hr=0x{hr:X8})");
+                return;
+            }
+
+            var iid = IID_IAudioEndpointVolume; // local copy to avoid CS0199
+            hr = _device.Activate(ref iid, CLSCTX_ALL, IntPtr.Zero, out _endpointVolume);
+            if (hr < 0 || _endpointVolume == null)
+            {
+                _logger?.LogWarning($"[AkiLink] AudioVolumeService: re-bind Activate failed (hr=0x{hr:X8})");
+                return;
+            }
+
+            // Re-subscribe on the new endpoint
+            _callback = new AudioEndpointVolumeCallbackImpl(OnVolumeNotification);
+            hr = _endpointVolume.RegisterControlChangeNotify(_callback);
+            if (hr < 0)
+            {
+                _logger?.LogWarning($"[AkiLink] AudioVolumeService: re-bind RegisterControlChangeNotify failed (hr=0x{hr:X8})");
+            }
+
+            // Push fresh values so the UI reflects the new device's state
+            VolumeChanged?.Invoke(GetVolume());
+            MuteChanged?.Invoke(GetMute());
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "[AkiLink] AudioVolumeService: default device re-bind failed: {Message}", ex.Message);
+        }
+        finally
+        {
+            _handlingDeviceChange = false;
+        }
     }
 
     // ────────────────────────────── Cleanup / IDisposable ──────────────────────────────
@@ -349,6 +569,13 @@ namespace AkiLink.Services;
     private void CleanupCom()
     {
         _callback?.ReleaseHandler();
+
+        if (_deviceNotificationClient != null)
+        {
+            try { _deviceEnumerator?.UnregisterEndpointNotificationCallback(_deviceNotificationClient); } catch { }
+            _deviceNotificationClient.ReleaseHandler();
+            _deviceNotificationClient = null;
+        }
 
         if (_endpointVolume != null)
         {

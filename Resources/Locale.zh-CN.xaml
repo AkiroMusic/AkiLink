@@ -38,7 +38,6 @@
     <sys:String x:Key="VolumeTitle">音量</sys:String>
     <sys:String x:Key="Mute">静音</sys:String>
     <sys:String x:Key="Unmute">取消静音</sys:String>
-    <sys:String x:Key="LevelTitle">电平</sys:String>
 
     <!-- ════════════ Settings Panel ════════════ -->
     <sys:String x:Key="SettingsTitle">设置</sys:String>

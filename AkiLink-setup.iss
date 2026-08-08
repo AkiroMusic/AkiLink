@@ -1,10 +1,10 @@
 ; AkiLink Inno Setup installer script
-; Produces: release/AkiLink-v1.1.8-win-x64-setup.exe
+; Produces: release/AkiLink-v1.2.0-win-x64-setup.exe
 ; Source: a non-single-file framework-dependent publish output
 ; (requires .NET 10 Desktop Runtime on the target machine)
 
 #define MyAppName "AkiLink"
-#define MyAppVersion "1.1.8"
+#define MyAppVersion "1.2.0"
 #define MyAppPublisher "AkiroMusic"
 #define MyAppExeName "AkiLink.exe"
 
@@ -16,7 +16,7 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=release
-OutputBaseFilename=AkiLink-v1.1.8-win-x64-setup
+OutputBaseFilename=AkiLink-v1.2.0-win-x64-setup
 SetupIconFile=Resources\AkiLink.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma2/max

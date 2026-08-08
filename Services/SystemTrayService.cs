@@ -53,7 +53,8 @@ public class SystemTrayService : INotificationService, IDisposable
 
         _taskbarIcon.ContextMenu = contextMenu;
 
-        // Double-click to restore
+        // Left-click to show/restore the window
+        _taskbarIcon.TrayLeftMouseUp += (_, _) => ShowWindow();
         _taskbarIcon.TrayBalloonTipClicked += (_, _) => ShowWindow();
         _taskbarIcon.PreviewTrayContextMenuOpen += (_, _) => { /* keep focus */ };
     }
@@ -101,11 +102,25 @@ public class SystemTrayService : INotificationService, IDisposable
     {
         if (_mainWindow == null) return;
 
+        // Only force the window to front when restoring from the tray.
+        // When the window is already visible and active (e.g. user clicked
+        // the tray icon while the app is on screen), keep the Topmost
+        // toggling out of the way to avoid an unwanted flash on top.
+        var wasHidden = !_mainWindow.IsVisible;
+
         _mainWindow.Show();
         _mainWindow.WindowState = WindowState.Normal;
-        _mainWindow.Activate();
-        _mainWindow.Topmost = true;
-        _mainWindow.Topmost = false; // Reset after activation
+
+        if (wasHidden)
+        {
+            _mainWindow.Activate();
+            _mainWindow.Topmost = true;
+            _mainWindow.Topmost = false; // Reset after activation
+        }
+        else
+        {
+            _mainWindow.Activate();
+        }
     }
 
     public void MinimizeToTray()

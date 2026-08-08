@@ -152,7 +152,6 @@ public partial class App : Application
         services.AddSingleton<IBluetoothPlatform, WinRtBluetoothPlatform>();
         services.AddSingleton<IBluetoothAudioService, BluetoothAudioService>();
         services.AddSingleton<IAudioVolumeService, AudioVolumeService>();
-        services.AddSingleton<IAudioLevelMeterService, AudioLevelMeterService>();
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<IDialogService, MessageBoxDialogService>();
         services.AddTransient<MainViewModel>();

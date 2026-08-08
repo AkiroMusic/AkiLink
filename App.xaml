@@ -20,7 +20,6 @@
             <converters:ViewTypeEqualityConverter x:Key="ViewTypeEqualityConverter" />
             <converters:ViewTypeToVisibilityConverter x:Key="ViewTypeToVisibilityConverter" />
             <converters:PercentToSignalOpacityConverter x:Key="PercentToSignalOpacityConverter" />
-    <converters:PercentToGridLengthConverter x:Key="PercentToGridLengthConverter" />
             <converters:ViewToActiveBrushConverter x:Key="ViewToActiveBrushConverter" />
             <converters:ViewToActiveBackgroundConverter x:Key="ViewToActiveBackgroundConverter" />
             <converters:BoolToBrushConverter x:Key="BoolToBrushConverter" />

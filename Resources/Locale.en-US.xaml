@@ -38,7 +38,6 @@
     <sys:String x:Key="VolumeTitle">Volume</sys:String>
     <sys:String x:Key="Mute">Mute</sys:String>
     <sys:String x:Key="Unmute">Unmute</sys:String>
-    <sys:String x:Key="LevelTitle">Level</sys:String>
 
     <!-- ════════════ Settings Panel ════════════ -->
     <sys:String x:Key="SettingsTitle">Settings</sys:String>

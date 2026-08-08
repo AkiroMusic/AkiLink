@@ -39,10 +39,24 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
     private Task? _pendingDisposeTask;
     private bool _disposed;
 
+    /// <summary>
+    /// Serializes ConnectAsync invocations so two concurrent connects for the
+    /// same device can never race (double-click, or manual connect while the
+    /// auto-reconnect loop is mid-flight). Overlapping AudioPlaybackConnection
+    /// objects confuse the Bluetooth stack and trigger reconnect loops —
+    /// the exact failure v1.1.2's teardown serialization was built to prevent.
+    /// </summary>
+    private readonly SemaphoreSlim _connectGate = new(1, 1);
+
+    /// <summary>
+    /// Cancellation source for the currently in-flight manual connect so a
+    /// user-initiated Disconnect() can abort a connect that is still inside
+    /// StartAsync/OpenAsync. Null when no manual connect is running.
+    /// </summary>
+    private CancellationTokenSource? _manualConnectCts;
+
     private readonly ILogger<BluetoothAudioService> _logger;
     private readonly IBluetoothPlatform _platform;
-
-    private readonly Random _rng = new();
 
     // ───────────────────────── Constructor ────────────────────────────
 
@@ -96,6 +110,40 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
             return false;
         }
 
+        // Serialize connection attempts: only one ConnectAsync may run at a
+        // time. A second (double-click / manual-connect racing auto-reconnect)
+        // is rejected immediately instead of tearing down and re-opening a
+        // fresh AudioPlaybackConnection over the first — the overlapping-
+        // connection condition that triggers Bluetooth reconnect loops.
+        if (!await _connectGate.WaitAsync(0, cancellationToken))
+        {
+            FireLog("ConnectAsync rejected: a connection operation is already in progress.");
+            return false;
+        }
+
+        // Manual connects get their own cancellation source so a user-initiated
+        // Disconnect() can abort a connect still inside StartAsync/OpenAsync.
+        using var manualCts = new CancellationTokenSource();
+        _manualConnectCts = manualCts;
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, manualCts.Token);
+
+        try
+        {
+            return await ConnectCoreAsync(deviceId, linkedCts.Token);
+        }
+        finally
+        {
+            lock (_lock)
+            {
+                if (ReferenceEquals(_manualConnectCts, manualCts))
+                    _manualConnectCts = null;
+            }
+            _connectGate.Release();
+        }
+    }
+
+    private async Task<bool> ConnectCoreAsync(string deviceId, CancellationToken cancellationToken)
+    {
         const int maxRetries = 3;
 
         for (int attempt = 1; attempt <= maxRetries; attempt++)
@@ -167,6 +215,17 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
                 FireLog($"AudioPlaybackConnection.StartAsync failed (non-fatal): {ex.Message}");
             }
 
+            // A Disconnect() that arrived while we were inside StartAsync must
+            // abort this connect instead of opening a connection the user just
+            // told us to tear down.
+            if (cancellationToken.IsCancellationRequested)
+            {
+                connection.StateChanged -= OnConnectionStateChanged;
+                connection.Dispose();
+                FireLog("ConnectAsync cancelled after StartAsync — connection discarded.");
+                return false;
+            }
+
             AudioPlaybackConnectionOpenResult result;
             try
             {
@@ -184,6 +243,15 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
                     try { await Task.Delay(1000, cancellationToken); } catch (OperationCanceledException) { return false; }
                     continue;
                 }
+                return false;
+            }
+
+            // Same as above: a Disconnect() during OpenAsync must win.
+            if (cancellationToken.IsCancellationRequested)
+            {
+                connection.StateChanged -= OnConnectionStateChanged;
+                connection.Dispose();
+                FireLog("ConnectAsync cancelled after OpenAsync — connection discarded.");
                 return false;
             }
 
@@ -237,6 +305,16 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
 
     public void Disconnect()
     {
+        // Abort any in-flight manual connect so a connect still inside
+        // StartAsync/OpenAsync cannot open a connection the user just told
+        // us to tear down (the connect discards the connection on cancel).
+        CancellationTokenSource? manualCts;
+        lock (_lock)
+        {
+            manualCts = _manualConnectCts;
+        }
+        try { manualCts?.Cancel(); } catch { /* best-effort */ }
+
         DisconnectInternal();
         SetState(AudioPlaybackConnectionState.Closed);
     }
@@ -581,12 +659,18 @@ public sealed class BluetoothAudioService : IBluetoothAudioService
             }
             else
             {
+                // Dispatcher unavailable (e.g. unit tests) — run inline.
                 action();
             }
         }
         catch
         {
-            try { action(); } catch { /* best effort */ }
+            // Dispatcher is shutting down mid-fire. Do NOT fall back to running
+            // inline here: the caller may be on a background thread (auto-
+            // reconnect MTA loop), and mutating ObservableObject/Observable-
+            // Collection state off the UI thread corrupts WPF bindings.
+            // Log-and-skip; the app is exiting anyway.
+            FireLog("FireOnUiThread: dispatcher unavailable, event dropped.");
         }
     }
 
