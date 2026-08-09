@@ -696,6 +696,20 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public void Constructor_LoadsAutoStartWithWindows_FromSettings()
+    {
+        var saved = new AppSettings { AutoStartWithWindows = true };
+        _settingsMock.Setup(x => x.Load()).Returns(saved);
+
+        var vm = new MainViewModel(_btMock.Object, _volumeMock.Object, _settingsMock.Object, _dialogMock.Object);
+
+        Assert.True(vm.AutoStartWithWindows);
+        // Loading must not persist (no SaveSettings during load) — avoids
+        // touching the registry merely by starting the app.
+        _settingsMock.Verify(x => x.Save(It.IsAny<AppSettings>()), Times.Never);
+    }
+
+    [Fact]
     public async Task TryAutoConnect_WhenDisabled_DoesNotScan()
     {
         // AutoConnectOnStartup defaults to false

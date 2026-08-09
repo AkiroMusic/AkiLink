@@ -182,6 +182,9 @@ public partial class MainViewModel : ObservableObject
     private bool _autoConnectOnStartup;
 
     [ObservableProperty]
+    private bool _autoStartWithWindows;
+
+    [ObservableProperty]
     private bool _closeToTray;
 
     [ObservableProperty]
@@ -488,6 +491,45 @@ public partial class MainViewModel : ObservableObject
         if (!_isLoadingSettings) SaveSettings();
     }
 
+    /// <summary>
+    /// The HKCU Run key — the standard per-user auto-start location. Writing here
+    /// requires no elevation and survives until the user removes the entry.
+    /// </summary>
+    private const string AutoStartRunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
+
+    partial void OnAutoStartWithWindowsChanged(bool value)
+    {
+        try
+        {
+            using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(AutoStartRunKey);
+            if (key is null) return;
+
+            if (value)
+            {
+                // Quote the executable path — it can contain spaces (e.g. under
+                // "Program Files (x86)" or a user directory). Environment.ProcessPath
+                // returns the actual running exe (handles single-file publish).
+                var exePath = Environment.ProcessPath;
+                if (!string.IsNullOrWhiteSpace(exePath))
+                {
+                    key.SetValue("AkiLink", $"\"{exePath}\"");
+                }
+            }
+            else
+            {
+                key.DeleteValue("AkiLink", throwOnMissingValue: false);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Registry access failure (e.g. policy-restricted environment) must
+            // never crash the app — the setting simply won't apply this time.
+            System.Diagnostics.Debug.WriteLine($"[AkiLink] Failed to update auto-start registry: {ex.Message}");
+        }
+
+        if (!_isLoadingSettings) SaveSettings();
+    }
+
     partial void OnSelectedDeviceChanged(BluetoothDeviceInfo? value)
     {
         ConnectCommand.NotifyCanExecuteChanged();
@@ -522,6 +564,7 @@ public partial class MainViewModel : ObservableObject
 
         AutoReconnect = s.AutoReconnect;
         AutoConnectOnStartup = s.AutoConnectOnStartup;
+        AutoStartWithWindows = s.AutoStartWithWindows;
         _lastDeviceId = s.LastDeviceId;
         CloseToTray = s.CloseToTray;
 
@@ -540,6 +583,7 @@ public partial class MainViewModel : ObservableObject
             IsMuted = IsMuted,
             AutoReconnect = AutoReconnect,
             AutoConnectOnStartup = AutoConnectOnStartup,
+            AutoStartWithWindows = AutoStartWithWindows,
             LastDeviceId = _lastDeviceId,
             CloseToTray = CloseToTray,
             Language = LocalizationService.Instance.CurrentCulture

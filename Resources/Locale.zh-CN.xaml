@@ -31,6 +31,8 @@
     <sys:String x:Key="AutoReconnectDesc">自动重连上次连接的设备</sys:String>
     <sys:String x:Key="AutoConnectOnStartup">启动时自动连接</sys:String>
     <sys:String x:Key="AutoConnectOnStartupDesc">AkiLink 启动时自动连接上次使用的设备</sys:String>
+    <sys:String x:Key="AutoStartWithWindows">开机自动启动</sys:String>
+    <sys:String x:Key="AutoStartWithWindowsDesc">登录 Windows 时自动启动 AkiLink</sys:String>
     <sys:String x:Key="CloseToTray">关闭到托盘</sys:String>
     <sys:String x:Key="CloseToTrayDesc">关闭窗口时最小化到托盘而非退出程序，音频持续播放</sys:String>
 
