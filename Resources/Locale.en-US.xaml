@@ -31,6 +31,8 @@
     <sys:String x:Key="AutoReconnectDesc">Automatically reconnect to last device</sys:String>
     <sys:String x:Key="AutoConnectOnStartup">Auto-Connect on Startup</sys:String>
     <sys:String x:Key="AutoConnectOnStartupDesc">When AkiLink starts, automatically connect to the last device</sys:String>
+    <sys:String x:Key="AutoStartWithWindows">Start with Windows</sys:String>
+    <sys:String x:Key="AutoStartWithWindowsDesc">Launch AkiLink automatically when you sign in to Windows</sys:String>
     <sys:String x:Key="CloseToTray">Close to Tray</sys:String>
     <sys:String x:Key="CloseToTrayDesc">When closing the window, minimize to tray instead of quitting</sys:String>
 

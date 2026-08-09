@@ -3,30 +3,29 @@
 
 [![Release](https://img.shields.io/github/v/release/AkiroMusic/AkiLink?style=flat-square&label=Latest%20Release&color=6C8CFF)](https://github.com/AkiroMusic/AkiLink/releases/latest)
 [![Build](https://img.shields.io/badge/build-passing-22c55e?style=flat-square)](https://github.com/AkiroMusic/AkiLink/actions)
-[![Tests](https://img.shields.io/badge/tests-74%20passed-22c55e?style=flat-square)](https://github.com/AkiroMusic/AkiLink/tree/main/tests/AkiLink.Tests)
+[![Tests](https://img.shields.io/badge/tests-75%20passed-22c55e?style=flat-square)](https://github.com/AkiroMusic/AkiLink/tree/main/tests/AkiLink.Tests)
 [![License](https://img.shields.io/badge/license-MIT-6C8CFF?style=flat-square)](LICENSE)
 
 **AkiLink** is a modern WPF desktop application that turns your Windows PC into a high-quality Bluetooth audio receiver. It uses the WinRT `AudioPlaybackConnection` API to receive streaming audio from paired Bluetooth devices (phones, tablets, etc.) with low latency and minimal setup.
 
 **AkiLink** 是一款现代化的 WPF 桌面应用，可以将你的 Windows 电脑变成高品质蓝牙音频接收器。它通过 WinRT `AudioPlaybackConnection` API 接收来自已配对蓝牙设备（手机、平板等）的流式音频，延迟低、设置简单。
 
-> **v1.2.0 — 重大稳定版发布 (Major Stability Release)**
-> This release removes the background-resource-heavy VU meter and ships 9 robustness fixes from a full stability audit (connect re-entrancy gate, default-audio-device re-binding, race-free disconnect, safe settings teardown, and more). See the [Version History](#version-history) for details.
-> **v1.2.0 — 重大稳定版发布**
-> 本版本移除了后台资源消耗最大的 VU 电平表，并基于完整的稳定性审计交付 9 项健壮性修复（连接重入门控、默认音频设备切换自动重绑、无竞态断开、安全的设置落盘等）。详见版本历史。
+> **v1.2.1 — Start with Windows / 开机自动启动**
+> A new **Start with Windows** toggle in Settings registers AkiLink in the HKCU auto-start (Run) key — it launches automatically when you sign in to Windows. The setting is a pure user-level registry entry (no elevation needed), applies instantly, and can be disabled from Settings or Task Manager at any time. See the [Version History](#version-history) for details.
+> 设置中新增 **开机自动启动** 开关：开启后 AkiLink 会写入用户级注册表自启动项（HKCU Run 键），登录 Windows 时自动启动。该设置是纯用户级注册表项（无需管理员权限），即时生效，随时可在设置或任务管理器中关闭。详见[版本历史](#版本历史)。
 
 ## Download
 ## 下载
 
 | Platform | Package | Notes |
 |----------|---------|-------|
-| Windows 10/11 x64 | [AkiLink-v1.2.0-win-x64-setup.exe](https://github.com/AkiroMusic/AkiLink/releases/latest/download/AkiLink-v1.2.0-win-x64-setup.exe) | **Recommended** — Inno Setup installer (requires .NET 10 Desktop Runtime) |
-| Windows 10/11 x64 | [self-contained.exe](https://github.com/AkiroMusic/AkiLink/releases/latest/download/AkiLink-v1.2.0-win-x64-self-contained.exe) | No runtime required, larger file |
-| Windows 10/11 x64 | [self-contained.zip](https://github.com/AkiroMusic/AkiLink/releases/latest/download/AkiLink-v1.2.0-win-x64-self-contained.zip) | Portable — unpack and run |
+| Windows 10/11 x64 | [AkiLink-v1.2.1-win-x64-setup.exe](https://github.com/AkiroMusic/AkiLink/releases/latest/download/AkiLink-v1.2.1-win-x64-setup.exe) | **Recommended** — Inno Setup installer (requires .NET 10 Desktop Runtime) |
+| Windows 10/11 x64 | [self-contained.exe](https://github.com/AkiroMusic/AkiLink/releases/latest/download/AkiLink-v1.2.1-win-x64-self-contained.exe) | No runtime required, larger file |
+| Windows 10/11 x64 | [self-contained.zip](https://github.com/AkiroMusic/AkiLink/releases/latest/download/AkiLink-v1.2.1-win-x64-self-contained.zip) | Portable — unpack and run |
 
 | 平台 | 安装包 | 说明 |
 |----------|---------|-------|
-| Windows 10/11 x64 | AkiLink-v1.2.0-win-x64-setup.exe | **推荐** — Inno Setup 安装程序（需 .NET 10 Desktop Runtime） |
+| Windows 10/11 x64 | AkiLink-v1.2.1-win-x64-setup.exe | **推荐** — Inno Setup 安装程序（需 .NET 10 Desktop Runtime） |
 | Windows 10/11 x64 | self-contained.exe | 免装运行时，体积更大 |
 | Windows 10/11 x64 | self-contained.zip | 便携版 — 解压即用 |
 
@@ -57,6 +56,8 @@
   - 传输模式（均衡 / 最佳音质 / 低延迟）
 - **Auto-Reconnect** — Automatically reconnects when the paired device comes back in range
 - **自动重连** — 设备回到范围内时自动重新连接
+- **Start with Windows** — Optional auto-launch at sign-in (user-level registry entry, toggle in Settings)
+- **开机自动启动** — 登录 Windows 时自动启动（用户级注册表项，可在设置中开关）
 - **Background Notifications** — Tray balloon alerts on connect and unexpected disconnect (suppressed for user-initiated disconnects)
 - **后台通知** — 连接/意外断开时托盘气泡提示（用户主动断开时不提示）
 - **Connection History** — Full log of connect/disconnect/error events with delete and clear support
@@ -167,9 +168,9 @@ The app uses `net10.0-windows10.0.19041.0` to access WinRT APIs (`Windows.Device
 ## Testing
 ## 测试
 
-74 unit tests covering:
+75 unit tests covering:
 
-74 个单元测试，涵盖：
+75 个单元测试，涵盖：
 
 - Constructor initialization and service subscription
 - 构造函数初始化与服务订阅
@@ -195,6 +196,8 @@ The app uses `net10.0-windows10.0.19041.0` to access WinRT APIs (`Windows.Device
 - 连接/断开按钮的 `CanExecute` 逻辑
 - Auto-connect on startup (guard flags, device matching, LastDeviceId persistence)
 - 启动自动连接（防护标志、设备匹配、LastDeviceId 持久化）
+- Start with Windows (loading the toggle from settings without persisting during load)
+- 开机自动启动（从设置加载开关，加载时不写回注册表）
 - Background notifications on connect/disconnect (and suppression for user-initiated disconnects)
 - 连接/断开的后台通知（以及用户主动断开时的通知抑制）
 
@@ -209,6 +212,8 @@ dotnet test ./tests/AkiLink.Tests
 ## Version History
 ## 版本历史
 
+- **v1.2.1** — New **Start with Windows** option: a toggle in Settings registers AkiLink in the per-user `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` key (quoted executable path via `Environment.ProcessPath`, which also works for single-file publish) so the app launches automatically at sign-in. Toggling off removes the registry entry; loading settings never rewrites the registry (respects manual overrides from Task Manager or Registry Editor); registry failures are caught and logged, never crashing the app. 1 new unit test (75 total).
+- **v1.2.1** — 新增 **开机自动启动** 选项：设置中的开关会在用户级 `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` 键下注册 AkiLink（通过 `Environment.ProcessPath` 获取加引号的完整路径，单文件发布同样适用），登录 Windows 时自动启动。关闭开关即删除注册表项；加载设置时绝不重写注册表（尊重用户在任务管理器或注册表编辑器中的手动修改）；注册表访问失败会被捕获并记录日志，绝不导致应用崩溃。新增 1 个单元测试（共 75 个）。
 - **v1.2.0** — Removed the live VU meter feature: `AudioLevelMeterService`, `IAudioLevelMeterService`, and `PercentToGridLengthConverter` were deleted (the meter polled CoreAudio `IAudioMeterInformation` at 33 Hz for the app's entire lifetime, needlessly waking the CPU even when idle in the tray — the biggest background-resource consumer). The LEVEL card was removed from the Devices view, the `LevelTitle` locale keys were dropped, and the 6 meter tests were removed (80 → 74 tests). Also: tray icon left-click now shows/restores the window (previously only the context menu or balloon-click did). Plus 9 robustness fixes from the stability audit: **(1)** connect is now guarded by a `SemaphoreSlim` gate and a VM-level `IsConnecting` flag so double-clicks can never launch two overlapping `AudioPlaybackConnection`s; **(2)** `Disconnect()` cancels an in-flight connect instead of racing it; **(3)** the auto-reconnect loop shares the same connect gate, eliminating the manual-vs-auto reconnect race that caused Bluetooth reconnect loops; **(4)** `AudioVolumeService` now implements `IMMNotificationClient` and re-binds the volume endpoint when the OS default playback device changes (headphones plugged in, output switched) without restarting the app; **(5)** `SettingsService.Dispose` now does a bounded wait for the in-flight flush (plus `_disposed` guards in `Save`/`FlushLoopAsync`) so the final settings write can never be lost or hung at exit; **(6)** `Connect()` captures the target device up front so selection changes mid-await can't corrupt the connected-device bookkeeping; **(7)** `FireOnUiThread` no longer runs mutated observable state inline off the UI thread during shutdown — it logs and drops instead; **(8)** `T()` tolerates stray `{` in external error strings (no more `FormatException` losing status updates); **(9)** volume/mute events fire only when the value actually changed (no duplicate notification storms).
 - **v1.2.0** — 移除实时 VU 电平表功能：删除 `AudioLevelMeterService`、`IAudioLevelMeterService`、`PercentToGridLengthConverter`（该电平表以 33Hz 持续轮询 CoreAudio `IAudioMeterInformation`，即使空闲在托盘也会不断唤醒 CPU——是后台资源消耗的最大来源）；Devices 视图的 LEVEL 卡片、`LevelTitle` 双语键与 6 个电平表测试一并移除（80 → 74 测试）。另外：托盘图标现在支持左键单击显示/恢复窗口（此前只能通过右键菜单或点击气泡）。另有稳定性审计的 9 项健壮性修复：**(1)** 连接操作由 `SemaphoreSlim` 门控 + VM 层 `IsConnecting` 标志双重防护，双击绝不可能创建两个重叠的 `AudioPlaybackConnection`；**(2)** `Disconnect()` 会取消正在进行的连接而非与之竞态；**(3)** 自动重连循环复用同一连接门控，消除导致蓝牙重连循环的手动/自动连接竞态；**(4)** `AudioVolumeService` 实现 `IMMNotificationClient`，当系统默认播放设备变化（插入耳机、切换输出）时自动重绑音量端点，无需重启应用；**(5)** `SettingsService.Dispose` 现在对进行中的落盘做有界等待（`Save`/`FlushLoopAsync` 增加 `_disposed` 防护），退出时最终设置写入不再可能丢失或挂起；**(6)** `Connect()` 预先捕获目标设备，await 期间切换选中设备不再污染已连接设备记账；**(7)** `FireOnUiThread` 在关闭期间不再于 UI 线程外内联修改可观察状态——改为记录日志并丢弃；**(8)** `T()` 容忍外部错误字符串中的杂散 `{`（不再因 `FormatException` 丢失状态更新）；**(9)** 音量/静音事件仅在值真正变化时触发（不再有重复通知风暴）。
 - **v1.1.8** — Three new features: **auto-connect on startup** (a new `AutoConnectOnStartup` toggle in Settings persists `LastDeviceId` after every successful connect, and `TryAutoConnectAsync` — fired after the main window shows — scans, merges into the `Devices` collection, matches on the saved device ID, and connects; best-effort and silently tolerant of failure); **background notifications** (a new `INotificationService` abstraction implemented by `SystemTrayService.ShowBalloonTip`, raising a tray balloon on connect and on unexpected disconnect, while a `_userInitiatedDisconnect` flag suppresses the disconnect toast when the user disconnects deliberately); and a live VU level meter (removed in v1.1.9). 15 new unit tests (80 total at the time).
