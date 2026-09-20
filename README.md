@@ -40,10 +40,6 @@
 - **Localization** — English and Chinese (中文) UI languages, switchable at runtime
 - **Dark Theme** — Modern dark UI with card-style layout throughout
 
-## Screenshots
-
-*(Coming soon)*
-
 ## Architecture
 
 ```
