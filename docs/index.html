@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-pack="aurora">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AkiLink — Windows Bluetooth audio receiver</title>
+<meta name="description" content="Turn your Windows PC into a high-quality Bluetooth audio receiver — stream from your phone or tablet with low latency and minimal setup.">
+<meta property="og:title" content="AkiLink — Windows Bluetooth audio receiver">
+<meta property="og:description" content="Turn your Windows PC into a high-quality Bluetooth audio receiver — stream from your phone or tablet with low latency and minimal setup.">
+<meta property="og:url" content="https://akiromusic.github.io/AkiLink/">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/palette.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="aurora-bg"></div>
+<div class="aurora-sweep"></div>
+<div class="star-field"></div>
+<div class="noise-overlay"></div>
+
+<header class="site-nav material-frosted">
+  <a class="brand" href="#"><span class="star"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c.9 6.5 4.6 10.2 12 12-7.4 1.8-11.1 5.5-12 12-.9-6.5-4.6-10.2-12-12C7.4 10.2 11.1 6.5 12 0z"/></svg></span>AkiLink</a>
+  <nav>
+    <a href="#features">Features</a>
+    <a href="#details">Details</a>
+    <a href="https://github.com/AkiroMusic/AkiLink" class="nav-keep">GitHub ↗</a>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="hero-card panel-contrast material-film flow-nebula spring-in">
+      <div class="eyebrow"><span class="star"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c.9 6.5 4.6 10.2 12 12-7.4 1.8-11.1 5.5-12 12-.9-6.5-4.6-10.2-12-12C7.4 10.2 11.1 6.5 12 0z"/></svg></span>Desktop App · WPF / .NET 10</div>
+      <h1>Aki<span class="grad-text">Link</span></h1>
+      <p class="tagline">Turn your Windows PC into a high-quality Bluetooth audio receiver — stream from your phone or tablet with low latency and minimal setup.</p>
+      <div class="badge-row"><span class="badge">License <b>MIT</b></span><span class="badge">Platform <b>Windows 10/11 x64</b></span><span class="badge">Tech <b>WPF · .NET 10</b></span><span class="badge">Tests <b>75 unit tests passing</b></span></div>
+      <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/AkiroMusic/AkiLink/releases/latest">Download latest</a>
+          <a class="btn btn-ghost" href="https://github.com/AkiroMusic/AkiLink">Source code</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="features">
+    <div class="block-head">
+      <div class="eyebrow"><span class="star"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c.9 6.5 4.6 10.2 12 12-7.4 1.8-11.1 5.5-12 12-.9-6.5-4.6-10.2-12-12C7.4 10.2 11.1 6.5 12 0z"/></svg></span>Features</div>
+      <h2>What it does</h2>
+      <p class="sub">AkiLink is a modern WPF desktop application that uses the WinRT AudioPlaybackConnection API to receive streaming audio from paired Bluetooth devices — phones, tablets and more. One-click connect with real-time status, full codec settings, auto-reconnect and tray-resident operation, backed by 75 passing unit tests.</p>
+    </div>
+    <div class="feature-grid">
+          <article class="feature-card material-liquid double-bezel spring-in wide" style="animation-delay:80ms"><div class="f-icon">📶</div><h3>Device discovery &amp; one-click connect</h3><p>Scans paired Bluetooth audio devices and establishes or tears down the connection in a single click, with real-time status for connected, disconnected and error states.</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:140ms"><div class="f-icon">🎚️</div><h3>Codec settings</h3><p>Preferred codec (Auto / SBC / AAC / aptX / LDAC), bitrate up to 990 kbps, 44.1 or 48 kHz sample rates, and Balanced / Best Quality / Low Latency transmission modes.</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:200ms"><div class="f-icon">🔁</div><h3>Auto-reconnect</h3><p>Automatically reconnects when the paired device comes back in range, with an optional auto-connect to the last device at startup.</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:260ms"><div class="f-icon">🔊</div><h3>Volume control</h3><p>Master volume slider plus mute toggle, kept in sync with Windows system audio.</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:320ms"><div class="f-icon">📌</div><h3>System tray &amp; compact mode</h3><p>Minimize to tray so audio continues in the background, with balloon alerts on connect and unexpected disconnect. A minimal always-on-top overlay covers monitoring.</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:380ms"><div class="f-icon">🕘</div><h3>Connection history</h3><p>A full log of connect, disconnect and error events with per-entry delete and clear support.</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:440ms"><div class="f-icon">🪟</div><h3>Start with Windows</h3><p>An optional auto-launch toggle registers a user-level registry entry — no elevation needed, applies instantly, and can be disabled from Settings or Task Manager.</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:500ms"><div class="f-icon">🌐</div><h3>Bilingual, dark &amp; glassy</h3><p>English and 中文 UI languages switchable at runtime, in a modern dark theme with card-style layout following the Ethereal Glass design language.</p></article>
+    </div>
+  </section>
+
+  
+
+  <section class="block" id="details">
+    <div class="block-head">
+      <div class="eyebrow"><span class="star"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c.9 6.5 4.6 10.2 12 12-7.4 1.8-11.1 5.5-12 12-.9-6.5-4.6-10.2-12-12C7.4 10.2 11.1 6.5 12 0z"/></svg></span>Details</div>
+      <h2>Downloads</h2>
+    </div>
+    <div class="detail-card material-liquid double-bezel"><table class="detail-table"><thead><tr><th>Platform</th><th>Package</th><th>Notes</th></tr></thead><tbody><tr><td>Windows 10/11 x64</td><td>AkiLink-v1.2.1-win-x64-setup.exe</td><td>Recommended — Inno Setup installer (requires .NET 10 Desktop Runtime)</td></tr><tr><td>Windows 10/11 x64</td><td>AkiLink-v1.2.1-win-x64-self-contained.exe</td><td>No runtime required, larger file</td></tr><tr><td>Windows 10/11 x64</td><td>AkiLink-v1.2.1-win-x64-self-contained.zip</td><td>Portable — unpack and run</td></tr></tbody></table></div>
+  </section>
+
+  <section class="block" id="quick-start">
+    <div class="block-head">
+      <div class="eyebrow"><span class="star"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c.9 6.5 4.6 10.2 12 12-7.4 1.8-11.1 5.5-12 12-.9-6.5-4.6-10.2-12-12C7.4 10.2 11.1 6.5 12 0z"/></svg></span>Quick Start</div>
+      <h2>Build from source</h2>
+    </div>
+    <div class="qs-grid">
+      <div class="qs-steps material-liquid double-bezel spring-in">
+        <ol><li><b>Requirements</b> — Windows 10 (build 19041+) or Windows 11, a Bluetooth adapter with audio playback support, and the .NET 10 SDK.</li><li><b>Build and run</b> with <code>dotnet build</code> and <code>dotnet run</code>, or run the test suite with <code>dotnet test</code>.</li><li><b>Or download</b> the installer, the self-contained exe, or the portable zip from Releases.</li><li><b>Connect</b> — scan your paired devices and click connect; your phone's audio now plays through the PC.</li></ol>
+      </div>
+      <div class="code-card panel-contrast spring-in" style="animation-delay:80ms">
+        <div class="code-title"><span class="dot"></span>shell</div>
+        <pre># Build
+dotnet build
+
+# Run
+dotnet run
+
+# Test
+dotnet test</pre>
+      </div>
+    </div>
+  </section>
+
+  <div class="block" style="text-align:center"><p class="quote-line">“Crafted with discipline.”</p></div>
+
+  <div class="hairline"></div>
+
+  <section class="block i18n-cn" id="中文" lang="zh-CN">
+    <div class="block-head">
+      <div class="eyebrow"><span class="star"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c.9 6.5 4.6 10.2 12 12-7.4 1.8-11.1 5.5-12 12-.9-6.5-4.6-10.2-12-12C7.4 10.2 11.1 6.5 12 0z"/></svg></span>桌面应用 · WPF / .NET 10</div>
+      <h2>项目简介</h2>
+      <p class="sub">AkiLink 是一款现代化的 WPF 桌面应用，通过 WinRT AudioPlaybackConnection API 接收来自已配对蓝牙设备（手机、平板等）的流式音频。一键连接、实时状态、完整的编码设置、自动重连与托盘常驻，75 个单元测试全部通过。</p>
+    </div>
+    <div class="feature-grid">
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:80ms"><div class="f-icon">📶</div><h3>设备发现与一键连接</h3><p>扫描已配对的蓝牙音频设备，单击即可建立或断开连接，已连接 / 已断开 / 错误状态实时可见。</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:140ms"><div class="f-icon">🎚️</div><h3>音频编码设置</h3><p>首选编码（自动 / SBC / AAC / aptX / LDAC）、比特率最高 990 kbps、44.1 或 48 kHz 采样率，以及均衡 / 最佳音质 / 低延迟传输模式。</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:200ms"><div class="f-icon">🔁</div><h3>自动重连</h3><p>设备回到范围内时自动重新连接，并支持启动时自动连接上次的设备。</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:260ms"><div class="f-icon">🔊</div><h3>音量控制</h3><p>主音量滑块加静音切换，与 Windows 系统音频保持同步。</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:320ms"><div class="f-icon">📌</div><h3>系统托盘与精简模式</h3><p>最小化到托盘，音频持续播放；连接与意外断开时弹出气泡提示。精简浮窗始终置顶，方便随时监控。</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:380ms"><div class="f-icon">🕘</div><h3>连接历史</h3><p>完整的连接 / 断开 / 错误事件日志，支持逐条删除与清空。</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:440ms"><div class="f-icon">🪟</div><h3>开机自动启动</h3><p>可选的自启动开关写入用户级注册表项——无需管理员权限，即时生效，可随时在设置或任务管理器中关闭。</p></article>
+          <article class="feature-card material-liquid double-bezel spring-in" style="animation-delay:500ms"><div class="f-icon">🌐</div><h3>双语、深色与玻璃质感</h3><p>英文与中文界面运行时一键切换，深色主题卡片式布局，延续 Ethereal Glass 设计语言。</p></article>
+    </div>
+    <div class="block-head" style="margin-top:var(--space-8)">
+      <div class="eyebrow"><span class="star"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c.9 6.5 4.6 10.2 12 12-7.4 1.8-11.1 5.5-12 12-.9-6.5-4.6-10.2-12-12C7.4 10.2 11.1 6.5 12 0z"/></svg></span>明细</div>
+      <h2>下载</h2>
+    </div>
+    <div class="detail-card material-liquid double-bezel"><table class="detail-table"><thead><tr><th>平台</th><th>安装包</th><th>说明</th></tr></thead><tbody><tr><td>Windows 10/11 x64</td><td>AkiLink-v1.2.1-win-x64-setup.exe</td><td>推荐 — Inno Setup 安装程序（需 .NET 10 Desktop Runtime）</td></tr><tr><td>Windows 10/11 x64</td><td>AkiLink-v1.2.1-win-x64-self-contained.exe</td><td>免装运行时，体积更大</td></tr><tr><td>Windows 10/11 x64</td><td>AkiLink-v1.2.1-win-x64-self-contained.zip</td><td>便携版 — 解压即用</td></tr></tbody></table></div>
+    <div class="qs-grid" style="margin-top:var(--space-8)">
+      <div class="qs-steps material-liquid double-bezel spring-in">
+        <ol><li><b>环境要求</b>——Windows 10（build 19041+）或 Windows 11、支持音频播放连接的蓝牙适配器，以及 .NET 10 SDK。</li><li><b>构建运行</b>——用 <code>dotnet build</code> 与 <code>dotnet run</code>，或用 <code>dotnet test</code> 运行测试套件。</li><li><b>或直接下载</b>——Releases 提供安装程序、免运行时 exe 与便携版 zip。</li><li><b>连接</b>——扫描已配对设备并点击连接，手机的音频即可通过电脑播放。</li></ol>
+      </div>
+      <div class="code-card panel-contrast spring-in" style="animation-delay:80ms">
+        <div class="code-title"><span class="dot"></span>shell</div>
+        <pre># Build
+dotnet build
+
+# Run
+dotnet run
+
+# Test
+dotnet test</pre>
+      </div>
+    </div>
+  </section>
+
+  <div class="block" style="text-align:center"><p class="quote-line">“以纪律精心打磨。”</p></div>
+
+  <footer class="site-footer">
+    <div class="footer-row material-liquid">
+      <div>
+        <a class="brand" href="#"><span class="star"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c.9 6.5 4.6 10.2 12 12-7.4 1.8-11.1 5.5-12 12-.9-6.5-4.6-10.2-12-12C7.4 10.2 11.1 6.5 12 0z"/></svg></span>AkiLink</a>
+        <p class="footer-meta" style="margin-top:var(--space-3);max-width:340px">Turn your Windows PC into a high-quality Bluetooth audio receiver — stream from your phone or tablet with low latency and minimal setup.</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/AkiroMusic/AkiLink">Source code ↗</a>
+        <a href="https://github.com/AkiroMusic/AkiLink/releases/latest">Releases ↗</a>
+      </div>
+      <div class="footer-links">
+        <a href="https://akiromusic.com/">akiromusic.com ↗</a>
+        <a href="https://github.com/AkiroMusic">GitHub Profile ↗</a>
+        <a href="https://akiromusic.github.io/AkiroMusic/">All project sites ↗</a>
+      </div>
+    </div>
+    <p class="footer-meta">© 2026 Akiro · MIT licensed. Built with the Aurora Glass design system.</p>
+  </footer>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,13 @@
+/* Per-site palette overrides (extracted from app source) */
+:root {
+  --bg-base: #0E1016;
+  --surface-1: #171A23;
+  --surface-2: #1F2430;
+  --surface-contrast: #0A0C12;
+  --border: #2A3040;
+  --accent: #6C8CFF;
+  --accent-hover: #8A9BFF;
+  --grad-a: #4860D9;
+  --grad-b: #2CC5E0;
+  --grad-c: #C4A8F5;
+}
