@@ -1,5 +1,6 @@
 # AkiLink — Bluetooth Audio Receiver for Windows
 
+[![Website](https://img.shields.io/badge/site-akiromusic.github.io-6D82FF)](https://akiromusic.github.io/AkiLink/)
 [![Release](https://img.shields.io/github/v/release/AkiroMusic/AkiLink?style=flat-square&label=Latest%20Release&color=6C8CFF)](https://github.com/AkiroMusic/AkiLink/releases/latest)
 [![Build](https://img.shields.io/badge/build-passing-22c55e?style=flat-square)](https://github.com/AkiroMusic/AkiLink/actions)
 [![Tests](https://img.shields.io/badge/tests-75%20passed-22c55e?style=flat-square)](https://github.com/AkiroMusic/AkiLink/tree/main/tests/AkiLink.Tests)
